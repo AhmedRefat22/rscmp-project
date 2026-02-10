@@ -1,0 +1,292 @@
+{
+    "common": {
+        "loading": "جاري التحميل...",
+        "error": "حدث خطأ",
+        "success": "تم بنجاح",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "delete": "حذف",
+        "edit": "تعديل",
+        "view": "عرض",
+        "submit": "إرسال",
+        "search": "بحث",
+        "filter": "تصفية",
+        "back": "رجوع",
+        "next": "التالي",
+        "previous": "السابق",
+        "close": "إغلاق",
+        "confirm": "تأكيد",
+        "yes": "نعم",
+        "no": "لا",
+        "or": "أو",
+        "and": "و",
+        "noData": "لا توجد بيانات",
+        "required": "مطلوب"
+    },
+    "nav": {
+        "home": "الرئيسية",
+        "about": "عن المنصة",
+        "conferences": "المؤتمرات",
+        "research": "الأبحاث",
+        "contact": "اتصل بنا",
+        "login": "تسجيل الدخول",
+        "register": "إنشاء حساب",
+        "logout": "تسجيل الخروج",
+        "profile": "الملف الشخصي",
+        "dashboard": "لوحة التحكم",
+        "mySubmissions": "مقدماتي",
+        "notifications": "الإشعارات"
+    },
+    "landing": {
+        "hero": {
+            "title": "منصة إدارة المؤتمرات العلمية والأبحاث",
+            "subtitle": "تبسيط عملية تقديم الأبحاث والمراجعة وإدارة المؤتمرات",
+            "cta": {
+                "login": "تسجيل الدخول",
+                "register": "إنشاء حساب",
+                "contact": "اتصل بنا"
+            }
+        },
+        "about": {
+            "title": "عن المنصة",
+            "description": "توفر منصتنا حلاً شاملاً لإدارة تقديم الأبحاث العلمية وعمليات المراجعة وتنظيم المؤتمرات.",
+            "features": {
+                "submission": {
+                    "title": "تقديم سهل",
+                    "description": "قدم أوراقك البحثية بعملية متعددة الخطوات ومبسطة"
+                },
+                "review": {
+                    "title": "مراجعة الأقران",
+                    "description": "مراجعة شفافة وعادلة مع معايير تقييم مفصلة"
+                },
+                "decision": {
+                    "title": "قرارات سريعة",
+                    "description": "سير عمل فعال لاتخاذ القرارات لمنظمي المؤتمرات"
+                },
+                "publish": {
+                    "title": "النشر",
+                    "description": "يتم نشر الأوراق المعتمدة وإتاحتها للجمهور"
+                }
+            }
+        },
+        "quotes": {
+            "title": "إلهام",
+            "quote1": {
+                "text": "البحث هو أن ترى ما رآه الجميع، وأن تفكر فيما لم يفكر فيه أحد من قبل.",
+                "author": "ألبرت سينت-جورجي"
+            },
+            "quote2": {
+                "text": "المهم هو ألا تتوقف عن التساؤل. الفضول له سببه الخاص للوجود.",
+                "author": "ألبرت أينشتاين"
+            },
+            "quote3": {
+                "text": "في وسط الصعوبة تكمن الفرصة.",
+                "author": "ألبرت أينشتاين"
+            }
+        },
+        "stats": {
+            "conferences": "المؤتمرات",
+            "submissions": "التقديمات",
+            "researchers": "الباحثون",
+            "countries": "الدول"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "مرحباً بعودتك",
+            "subtitle": "سجل الدخول إلى حسابك",
+            "email": "عنوان البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "rememberMe": "تذكرني",
+            "forgotPassword": "نسيت كلمة المرور؟",
+            "submit": "تسجيل الدخول",
+            "noAccount": "ليس لديك حساب؟",
+            "register": "سجل الآن"
+        },
+        "register": {
+            "title": "إنشاء حساب",
+            "subtitle": "انضم إلى مجتمعنا البحثي",
+            "fullNameEn": "الاسم الكامل (بالإنجليزية)",
+            "fullNameAr": "الاسم الكامل (بالعربية)",
+            "email": "عنوان البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "confirmPassword": "تأكيد كلمة المرور",
+            "phoneNumber": "رقم الهاتف",
+            "institution": "المؤسسة",
+            "preferredLanguage": "اللغة المفضلة",
+            "submit": "إنشاء الحساب",
+            "hasAccount": "لديك حساب بالفعل؟",
+            "login": "تسجيل الدخول"
+        },
+        "roleSelection": {
+            "title": "اختر دورك",
+            "subtitle": "اختر كيف تريد الوصول إلى المنصة",
+            "roles": {
+                "reviewer": {
+                    "title": "المراجع",
+                    "description": "مراجعة وتقييم تقديمات الأبحاث"
+                },
+                "chairman": {
+                    "title": "رئيس اللجنة",
+                    "description": "اتخاذ القرارات بشأن الأوراق المراجعة"
+                },
+                "admin": {
+                    "title": "المسؤول",
+                    "description": "إدارة إعدادات المنصة والمستخدمين"
+                },
+                "public": {
+                    "title": "عام",
+                    "description": "تصفح الأبحاث المنشورة"
+                }
+            },
+            "continue": "الاستمرار كـ"
+        },
+        "forgotPassword": {
+            "title": "إعادة تعيين كلمة المرور",
+            "subtitle": "أدخل بريدك الإلكتروني لتلقي تعليمات إعادة التعيين",
+            "email": "عنوان البريد الإلكتروني",
+            "submit": "إرسال رابط إعادة التعيين",
+            "backToLogin": "العودة لتسجيل الدخول"
+        }
+    },
+    "dashboard": {
+        "welcome": "مرحباً",
+        "overview": "نظرة عامة",
+        "recentActivity": "النشاط الأخير",
+        "quickActions": "إجراءات سريعة",
+        "stats": {
+            "pending": "معلق",
+            "completed": "مكتمل",
+            "approved": "موافق عليه",
+            "rejected": "مرفوض"
+        }
+    },
+    "reviewer": {
+        "title": "لوحة تحكم المراجع",
+        "pendingReviews": "المراجعات المعلقة",
+        "completedReviews": "المراجعات المكتملة",
+        "assignedReviews": "المراجعات المُسندة",
+        "startReview": "بدء المراجعة",
+        "submitReview": "إرسال المراجعة",
+        "declineReview": "رفض",
+        "dueDate": "تاريخ الاستحقاق",
+        "criteria": "معايير التقييم",
+        "comments": "التعليقات",
+        "commentsToAuthor": "تعليقات للمؤلف",
+        "commentsToChairman": "تعليقات سرية لرئيس اللجنة",
+        "recommendation": "التوصية",
+        "score": "الدرجة"
+    },
+    "chairman": {
+        "title": "لوحة تحكم رئيس اللجنة",
+        "pendingDecisions": "القرارات المعلقة",
+        "reviewSummary": "ملخص المراجعة",
+        "makeDecision": "اتخاذ القرار",
+        "approve": "موافقة",
+        "reject": "رفض",
+        "revisionRequired": "مطلوب تعديل",
+        "justification": "التبرير",
+        "averageScore": "متوسط الدرجات",
+        "recommendations": "توصيات المراجعين",
+        "decisions": "القرارات"
+    },
+    "admin": {
+        "title": "لوحة تحكم المسؤول",
+        "users": "المستخدمون",
+        "conferences": "المؤتمرات",
+        "settings": "الإعدادات",
+        "auditLogs": "سجلات المراجعة",
+        "messages": "رسائل الاتصال",
+        "statistics": "الإحصائيات"
+    },
+    "public": {
+        "title": "لوحة تحكم الباحث"
+    },
+    "research": {
+        "title": "البحث",
+        "mySubmissions": "مقدماتي",
+        "newSubmission": "تقديم جديد",
+        "titleEn": "العنوان (بالإنجليزية)",
+        "titleAr": "العنوان (بالعربية)",
+        "abstractEn": "الملخص (بالإنجليزية)",
+        "abstractAr": "الملخص (عربي)",
+        "topicArea": "المجال البحثي",
+        "authors": "المؤلفون",
+        "addAuthor": "إضافة مؤلف",
+        "uploadFile": "رفع ملف PDF",
+        "submit": "إرسال للمراجعة",
+        "saveDraft": "حفظ كمسودة",
+        "status": {
+            "draft": "مسودة",
+            "submitted": "مقدم",
+            "underReview": "قيد المراجعة",
+            "reviewCompleted": "اكتملت المراجعة",
+            "approved": "موافق عليه",
+            "rejected": "مرفوض",
+            "revisionRequired": "مطلوب تعديل"
+        }
+    },
+    "conference": {
+        "title": "المؤتمر",
+        "name": "اسم المؤتمر",
+        "description": "الوصف",
+        "dates": "التواريخ",
+        "deadline": "آخر موعد للتقديم",
+        "location": "الموقع",
+        "active": "نشط",
+        "submissions": "التقديمات",
+        "criteria": "معايير المراجعة"
+    },
+    "contact": {
+        "title": "اتصل بنا",
+        "subtitle": "تواصل مع الإدارة",
+        "name": "اسمك",
+        "email": "بريدك الإلكتروني",
+        "subject": "الموضوع",
+        "message": "الرسالة",
+        "submit": "إرسال الرسالة",
+        "success": "تم إرسال الرسالة بنجاح. سنعود إليك قريباً."
+    },
+    "notifications": {
+        "title": "الإشعارات",
+        "markAllRead": "تحديد الكل كمقروء",
+        "noNotifications": "لا توجد إشعارات",
+        "viewAll": "عرض الكل"
+    },
+    "errors": {
+        "invalidCredentials": "بريد إلكتروني أو كلمة مرور غير صحيحة",
+        "emailExists": "البريد الإلكتروني مسجل بالفعل",
+        "unauthorized": "وصول غير مصرح به",
+        "notFound": "غير موجود",
+        "serverError": "خطأ في الخادم. يرجى المحاولة لاحقاً.",
+        "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+        "validationError": "يرجى التحقق من بياناتك"
+    },
+    "footer": {
+        "copyright": "© 2026 منصة إدارة المؤتمرات العلمية. جميع الحقوق محفوظة.",
+        "privacy": "سياسة الخصوصية",
+        "terms": "شروط الخدمة"
+    },
+    "roleSelector": {
+        "title": "اختر بوابتك",
+        "subtitle": "حدد دورك للمتابعة إلى صفحة تسجيل الدخول",
+        "researcher": {
+            "title": "باحث",
+            "description": "تقديم ومتابعة أوراقك البحثية"
+        },
+        "reviewer": {
+            "title": "مراجع",
+            "description": "مراجعة وتقييم الأوراق المقدمة"
+        },
+        "chairman": {
+            "title": "رئيس اللجنة",
+            "description": "إدارة المؤتمر واتخاذ القرارات النهائية"
+        },
+        "admin": {
+            "title": "مسؤول النظام",
+            "description": "إدارة مستخدمي النظام والإعدادات"
+        },
+        "newUser": "ليس لديك حساب؟",
+        "createAccount": "أنشئ حساباً هنا"
+    }
+}

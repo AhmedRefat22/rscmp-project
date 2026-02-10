@@ -1,0 +1,20 @@
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.pdb
+
+# Node
+node_modules/
+dist/
+.env
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# User specific
+.gemini/

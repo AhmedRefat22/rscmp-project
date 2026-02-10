@@ -1,0 +1,313 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "view": "View",
+        "submit": "Submit",
+        "search": "Search",
+        "filter": "Filter",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "close": "Close",
+        "confirm": "Confirm",
+        "yes": "Yes",
+        "no": "No",
+        "or": "or",
+        "and": "and",
+        "noData": "No data available",
+        "required": "Required",
+        "status": "Status",
+        "actions": "Actions"
+    },
+    "nav": {
+        "home": "Home",
+        "about": "About",
+        "conferences": "Conferences",
+        "research": "Research",
+        "contact": "Contact",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "profile": "Profile",
+        "dashboard": "Dashboard",
+        "mySubmissions": "My Submissions",
+        "notifications": "Notifications"
+    },
+    "landing": {
+        "hero": {
+            "title": "Research & Scientific Conference Management Platform",
+            "subtitle": "Streamline your research submission, peer review, and conference management workflow",
+            "cta": {
+                "login": "Login",
+                "register": "Register",
+                "contact": "Contact Us"
+            }
+        },
+        "about": {
+            "title": "About the Platform",
+            "description": "Our platform provides a comprehensive solution for managing scientific research submissions, peer review processes, and conference organization.",
+            "features": {
+                "submission": {
+                    "title": "Easy Submission",
+                    "description": "Submit your research papers with a streamlined multi-step process"
+                },
+                "review": {
+                    "title": "Peer Review",
+                    "description": "Transparent and fair peer review with detailed evaluation criteria"
+                },
+                "decision": {
+                    "title": "Quick Decisions",
+                    "description": "Efficient decision-making workflow for conference organizers"
+                },
+                "publish": {
+                    "title": "Publication",
+                    "description": "Approved papers are published and accessible to the public"
+                }
+            }
+        },
+        "quotes": {
+            "title": "Inspiration",
+            "quote1": {
+                "text": "Research is to see what everybody else has seen, and to think what nobody else has thought.",
+                "author": "Albert Szent-Györgyi"
+            },
+            "quote2": {
+                "text": "The important thing is not to stop questioning. Curiosity has its own reason for existing.",
+                "author": "Albert Einstein"
+            },
+            "quote3": {
+                "text": "In the middle of difficulty lies opportunity.",
+                "author": "Albert Einstein"
+            }
+        },
+        "stats": {
+            "conferences": "Conferences",
+            "submissions": "Submissions",
+            "researchers": "Researchers",
+            "countries": "Countries"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Welcome Back",
+            "subtitle": "Sign in to your account",
+            "email": "Email Address",
+            "password": "Password",
+            "rememberMe": "Remember me",
+            "forgotPassword": "Forgot password?",
+            "submit": "Sign In",
+            "noAccount": "Don't have an account?",
+            "register": "Register now"
+        },
+        "register": {
+            "title": "Create Account",
+            "subtitle": "Join our research community",
+            "fullNameEn": "Full Name (English)",
+            "fullNameAr": "Full Name (Arabic)",
+            "email": "Email Address",
+            "password": "Password",
+            "confirmPassword": "Confirm Password",
+            "phoneNumber": "Phone Number",
+            "institution": "Institution",
+            "preferredLanguage": "Preferred Language",
+            "submit": "Create Account",
+            "hasAccount": "Already have an account?",
+            "login": "Sign in"
+        },
+        "roleSelection": {
+            "title": "Select Your Role",
+            "subtitle": "Choose how you want to access the platform",
+            "roles": {
+                "reviewer": {
+                    "title": "Reviewer",
+                    "description": "Review and evaluate research submissions"
+                },
+                "chairman": {
+                    "title": "Chairman",
+                    "description": "Make decisions on reviewed papers"
+                },
+                "admin": {
+                    "title": "Administrator",
+                    "description": "Manage platform settings and users"
+                },
+                "public": {
+                    "title": "Public",
+                    "description": "Browse published research"
+                }
+            },
+            "continue": "Continue as"
+        },
+        "forgotPassword": {
+            "title": "Reset Password",
+            "subtitle": "Enter your email to receive reset instructions",
+            "email": "Email Address",
+            "submit": "Send Reset Link",
+            "backToLogin": "Back to login"
+        }
+    },
+    "dashboard": {
+        "welcome": "Welcome",
+        "overview": "Overview",
+        "recentActivity": "Recent Activity",
+        "quickActions": "Quick Actions",
+        "stats": {
+            "pending": "Pending",
+            "completed": "Completed",
+            "approved": "Approved",
+            "rejected": "Rejected"
+        }
+    },
+    "reviewer": {
+        "title": "Reviewer Dashboard",
+        "pendingReviews": "Pending Reviews",
+        "completedReviews": "Completed Reviews",
+        "assignedReviews": "Assigned Reviews",
+        "startReview": "Start Review",
+        "submitReview": "Submit Review",
+        "declineReview": "Decline",
+        "dueDate": "Due Date",
+        "criteria": "Evaluation Criteria",
+        "comments": "Comments",
+        "commentsToAuthor": "Comments to Author",
+        "commentsToChairman": "Confidential Comments to Chairman",
+        "recommendation": "Recommendation",
+        "score": "Score"
+    },
+    "chairman": {
+        "title": "Chairman Dashboard",
+        "pendingDecisions": "Pending Decisions",
+        "reviewSummary": "Review Summary",
+        "makeDecision": "Make Decision",
+        "approve": "Approve",
+        "reject": "Reject",
+        "revisionRequired": "Revision Required",
+        "justification": "Justification",
+        "averageScore": "Average Score",
+        "recommendations": "Reviewer Recommendations",
+        "decisions": "Decisions"
+    },
+    "admin": {
+        "title": "Admin Dashboard",
+        "users": "Users",
+        "conferences": "Conferences",
+        "settings": "Settings",
+        "auditLogs": "Audit Logs",
+        "messages": "Contact Messages",
+        "statistics": "Statistics"
+    },
+    "public": {
+        "title": "Researcher Dashboard"
+    },
+    "research": {
+        "title": "Research",
+        "mySubmissions": "My Submissions",
+        "newSubmission": "New Submission",
+        "publicResearch": "Published Research",
+        "titleEn": "Title (English)",
+        "titleAr": "Title (Arabic)",
+        "abstractEn": "Abstract (English)",
+        "abstractAr": "Abstract (Arabic)",
+        "topicArea": "Topic Area",
+        "authors": "Authors",
+        "addAuthor": "Add Author",
+        "uploadFile": "Upload PDF",
+        "submit": "Submit for Review",
+        "saveDraft": "Save Draft",
+        "conference": "Conference",
+        "submissions": "Submissions",
+        "submitResearch": "Submit Research",
+        "submittedAt": "Submitted At",
+        "status": {
+            "draft": "Draft",
+            "submitted": "Submitted",
+            "underreview": "Under Review",
+            "reviewcompleted": "Review Completed",
+            "approved": "Approved",
+            "rejected": "Rejected",
+            "revisionrequired": "Revision Required"
+        }
+    },
+    "conference": {
+        "title": "Conference",
+        "name": "Conference Name",
+        "description": "Description",
+        "dates": "Dates",
+        "deadline": "Submission Deadline",
+        "location": "Location",
+        "active": "Active",
+        "submissions": "Submissions",
+        "criteria": "Review Criteria"
+    },
+    "contact": {
+        "title": "Contact Us",
+        "subtitle": "Get in touch with the administration",
+        "name": "Your Name",
+        "email": "Your Email",
+        "subject": "Subject",
+        "message": "Message",
+        "send": "Send Message",
+        "successTitle": "Message Sent Successfully!",
+        "successMessage": "We will get back to you within 24-48 hours."
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Mark all as read",
+        "noNotifications": "No notifications",
+        "viewAll": "View All",
+        "empty": "No notifications yet"
+    },
+    "profile": {
+        "title": "Profile",
+        "editProfile": "Edit Profile",
+        "saveChanges": "Save Changes",
+        "changePassword": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmNewPassword": "Confirm New Password"
+    },
+    "validation": {
+        "required": "This field is required"
+    },
+    "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "emailExists": "Email already registered",
+        "unauthorized": "Unauthorized access",
+        "notFound": "Not found",
+        "serverError": "Server error. Please try again later.",
+        "networkError": "Network error. Please check your connection.",
+        "validationError": "Please check your input"
+    },
+    "footer": {
+        "copyright": "© 2026 RSCMP. All rights reserved.",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+    },
+    "roleSelector": {
+        "title": "Choose Your Portal",
+        "subtitle": "Select your role to continue to the login page",
+        "researcher": {
+            "title": "Researcher",
+            "description": "Submit and track your research papers"
+        },
+        "reviewer": {
+            "title": "Reviewer",
+            "description": "Review and evaluate submitted papers"
+        },
+        "chairman": {
+            "title": "Chairman",
+            "description": "Manage conference and make final decisions"
+        },
+        "admin": {
+            "title": "Administrator",
+            "description": "Manage system users and settings"
+        },
+        "newUser": "Don't have an account?",
+        "createAccount": "Create one here"
+    }
+}

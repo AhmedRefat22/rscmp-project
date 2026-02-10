@@ -1,0 +1,22 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+  RSCMP.Domain -> C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.Domain\bin\Debug\net8.0\RSCMP.Domain.dll
+  RSCMP.Application -> C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.Application\bin\Debug\net8.0\RSCMP.Application.dll
+  RSCMP.Infrastructure -> C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.Infrastructure\bin\Debug\net8.0\RSCMP.Infrastructure.dll
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Controllers\DecisionsController.cs(206,60): warning CS8602: Dereference of a possibly null reference. [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(278,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(297,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(316,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(335,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+
+Build FAILED.
+
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Controllers\DecisionsController.cs(206,60): warning CS8602: Dereference of a possibly null reference. [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(278,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(297,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(316,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\Program.cs(335,33): error CS0103: The name 'Domain' does not exist in the current context [C:\Users\Ahmed Refat\.gemini\antigravity\scratch\RSCMP\src\RSCMP.API\RSCMP.API.csproj]
+    1 Warning(s)
+    4 Error(s)
+
+Time Elapsed 00:00:01.35
