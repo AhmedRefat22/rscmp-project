@@ -30,9 +30,42 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add DbContext
+// Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    
+    // Fix: Handle potential formatting issues from environment variables
+    if (!string.IsNullOrEmpty(connectionString))
+    {
+        // Remove framing quotes if present (common copy-paste error)
+        connectionString = connectionString.Trim().Trim('"');
+
+        // Parse URI format (postgres://...) to Connection String format (Host=...;...)
+        if (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://"))
+        {
+            try 
+            {
+                var uri = new Uri(connectionString);
+                var userInfo = uri.UserInfo.Split(':');
+                var builder = new Npgsql.NpgsqlConnectionStringBuilder
+                {
+                    Host = uri.Host,
+                    Port = uri.Port > 0 ? uri.Port : 5432,
+                    Database = uri.AbsolutePath.Trim('/'),
+                    Username = userInfo.Length > 0 ? userInfo[0] : null,
+                    Password = userInfo.Length > 1 ? userInfo[1] : null,
+                    Pooling = true
+                };
+                connectionString = builder.ToString();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to parse PostgreSQL URI connection string");
+            }
+        }
+    }
+
     if (builder.Configuration.GetValue<bool>("UsePostgres"))
     {
         options.UseNpgsql(connectionString);
