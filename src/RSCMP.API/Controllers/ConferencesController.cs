@@ -34,25 +34,35 @@ public class ConferencesController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>
-    /// Get all conferences (public)
-    /// </summary>
-    [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<ConferenceDto>), StatusCodes.Status200OK)]
+        [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] bool activeOnly = false)
     {
-        var query = _context.Conferences.AsQueryable();
-        
-        if (activeOnly)
-            query = query.Where(c => c.IsActive && c.EndDate >= DateTime.UtcNow);
+        try
+        {
+            var query = _context.Conferences.AsQueryable();
+            
+            if (activeOnly)
+                query = query.Where(c => c.IsActive && c.EndDate >= DateTime.UtcNow);
 
-        var conferences = await query
-            .Include(c => c.Researches.Where(r => !r.IsDeleted))
-            .OrderByDescending(c => c.StartDate)
-            .ToListAsync();
+            var conferences = await query
+                .Include(c => c.Researches.Where(r => !r.IsDeleted))
+                .OrderByDescending(c => c.StartDate)
+                .ToListAsync();
 
-        var dtos = _mapper.Map<IEnumerable<ConferenceDto>>(conferences);
-        return Ok(dtos);
+            var dtos = _mapper.Map<IEnumerable<ConferenceDto>>(conferences);
+            return Ok(dtos);
+        }
+        catch (Exception ex)
+        {
+            // TEMPORARY DEBUGGING: Return full error details
+            return StatusCode(500, new 
+            { 
+                error = "Database Connection Failed", 
+                message = ex.Message, 
+                inner = ex.InnerException?.Message,
+                stackTrace = ex.StackTrace 
+            });
+        }
     }
 
     /// <summary>
