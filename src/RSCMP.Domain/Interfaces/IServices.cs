@@ -2,7 +2,7 @@ namespace RSCMP.Domain.Interfaces;
 
 public interface IFileStorageService
 {
-    Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, string folder = "uploads");
+    Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, string folder = "uploads", string[]? allowedTypes = null);
     Task<Stream?> DownloadFileAsync(string filePath);
     Task<bool> DeleteFileAsync(string filePath);
     Task<bool> FileExistsAsync(string filePath);

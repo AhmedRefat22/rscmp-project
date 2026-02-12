@@ -420,7 +420,7 @@ public class ResearchController : ControllerBase
         var checksum = _fileStorageService.GetFileChecksum(stream);
         stream.Position = 0;
         
-        var filePath = await _fileStorageService.UploadFileAsync(stream, file.FileName, file.ContentType, $"research/{id}");
+        var filePath = await _fileStorageService.UploadFileAsync(stream, file.FileName, file.ContentType, $"research/{id}", new[] { "application/pdf" });
 
         // Save file record
         var researchFile = new ResearchFile

@@ -221,6 +221,9 @@ public class DecisionsController : ControllerBase
             .Include(d => d.Chairman)
             .FirstOrDefaultAsync(d => d.Id == decision.Id);
 
+        if (decision == null)
+            return StatusCode(500, new { message = "Failed to retrieve created decision | فشل في استرجاع القرار الذي تم إنشاؤه" });
+
         var dto = _mapper.Map<DecisionDto>(decision);
         return CreatedAtAction(nameof(GetById), new { id = decision.Id }, dto);
     }

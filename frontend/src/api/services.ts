@@ -86,9 +86,7 @@ export const conferencesApi = {
     },
 
     create: async (data: Partial<Conference> | FormData): Promise<Conference> => {
-        const response = await api.post('/conferences', data, {
-            headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined
-        });
+        const response = await api.post('/conferences', data);
         return response.data;
     },
 
@@ -146,9 +144,7 @@ export const researchApi = {
     uploadFile: async (id: string, file: File, fileType = 'MainDocument'): Promise<any> => {
         const formData = new FormData();
         formData.append('file', file);
-        const response = await api.post(`/research/${id}/files?fileType=${fileType}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const response = await api.post(`/research/${id}/files?fileType=${fileType}`, formData);
         return response.data;
     },
 

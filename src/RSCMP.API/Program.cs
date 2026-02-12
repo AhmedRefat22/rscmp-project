@@ -176,11 +176,14 @@ builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Register FileStorageService
+var webRoot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(webRoot);
+
 var fileStorageSettings = builder.Configuration.GetSection("FileStorage");
 builder.Services.AddSingleton<IFileStorageService>(sp => 
     new FileStorageService(
-        fileStorageSettings["BasePath"] ?? "./uploads",
-        fileStorageSettings["BaseUrl"] ?? "https://localhost:7000/files"));
+        webRoot,
+        fileStorageSettings["BaseUrl"] ?? "http://localhost:5000"));
 
 // Register EmailService
 var emailSettings = builder.Configuration.GetSection("EmailSettings");

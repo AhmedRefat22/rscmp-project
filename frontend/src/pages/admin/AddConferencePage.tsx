@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
-import { Calendar, MapPin, Globe, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Calendar, Globe, Loader2, Image as ImageIcon } from 'lucide-react';
 import { conferencesApi } from '../../api/services';
 
 const conferenceSchema = z.object({
@@ -13,7 +13,7 @@ const conferenceSchema = z.object({
     nameAr: z.string().min(3, 'Arabic name is required'),
     descriptionEn: z.string().optional(),
     descriptionAr: z.string().optional(),
-    location: z.string().min(2, 'Location is required'),
+    // location: z.string().min(2, 'Location is required'), // Removed per request
     startDate: z.string().min(1, 'Start date is required'),
     endDate: z.string().min(1, 'End date is required'),
     // submissionDeadline: z.string().min(1, 'Submission deadline is required'), // Removed - using EndDate
@@ -54,7 +54,7 @@ export default function AddConferencePage() {
             formData.append('nameAr', data.nameAr);
             formData.append('descriptionEn', data.descriptionEn || '');
             formData.append('descriptionAr', data.descriptionAr || '');
-            formData.append('location', data.location);
+            // formData.append('location', data.location); // Removed
             formData.append('startDate', data.startDate);
             formData.append('endDate', data.endDate);
             formData.append('submissionDeadline', data.endDate); // Default to end date
@@ -141,7 +141,8 @@ export default function AddConferencePage() {
 
                     {/* Dates & Location */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+                        {/* Location Removed */}
+                        {/* <div>
                             <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
                                 {i18n.language === 'ar' ? 'الموقع' : 'Location'}
                             </label>
@@ -153,7 +154,7 @@ export default function AddConferencePage() {
                                 />
                             </div>
                             {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>}
-                        </div>
+                        </div> */}
                         <div>
                             <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
                                 {i18n.language === 'ar' ? 'الموقع الإلكتروني (اختياري)' : 'Website (Optional)'}

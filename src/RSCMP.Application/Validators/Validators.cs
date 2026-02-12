@@ -61,10 +61,10 @@ public class ConferenceCreateRequestValidator : AbstractValidator<ConferenceCrea
             .GreaterThan(DateTime.UtcNow.AddDays(-1)).WithMessage("Start date must be in the future | تاريخ البداية يجب أن يكون في المستقبل");
 
         RuleFor(x => x.EndDate)
-            .GreaterThan(x => x.StartDate).WithMessage("End date must be after start date | تاريخ النهاية يجب أن يكون بعد تاريخ البداية");
+            .GreaterThanOrEqualTo(x => x.StartDate).WithMessage("End date must be after or same as start date | تاريخ النهاية يجب أن يكون بعد أو نفس تاريخ البداية");
 
         RuleFor(x => x.SubmissionDeadline)
-            .LessThan(x => x.StartDate).WithMessage("Submission deadline must be before conference start | آخر موعد للتقديم يجب أن يكون قبل بداية المؤتمر");
+            .LessThanOrEqualTo(x => x.EndDate).WithMessage("Submission deadline must be before conference end | آخر موعد للتقديم يجب أن يكون قبل نهاية المؤتمر");
     }
 }
 

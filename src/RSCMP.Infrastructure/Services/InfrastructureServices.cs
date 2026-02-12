@@ -20,11 +20,15 @@ public class FileStorageService : IFileStorageService
         Directory.CreateDirectory(_basePath);
     }
 
-    public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, string folder = "uploads")
+    public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, string folder = "uploads", string[]? allowedTypes = null)
     {
-        // Validate file type (PDF only for research files)
-        if (!contentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Only PDF files are allowed | يُسمح فقط بملفات PDF");
+        // Validate file type if specified
+        if (allowedTypes != null && allowedTypes.Length > 0)
+        {
+            if (!allowedTypes.Contains(contentType, StringComparer.OrdinalIgnoreCase))
+                throw new InvalidOperationException($"Invalid file type. Allowed: {string.Join(", ", allowedTypes)} | نوع الملف غير مسموح");
+        }
+
 
         var folderPath = Path.Combine(_basePath, folder);
         Directory.CreateDirectory(folderPath);

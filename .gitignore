@@ -16,5 +16,11 @@ dist/
 logs/
 *.log
 
+
 # User specific
 .gemini/
+
+# Uploads
+src/RSCMP.API/uploads/
+src/RSCMP.API/wwwroot/
+!src/RSCMP.API/wwwroot/.gitkeep
