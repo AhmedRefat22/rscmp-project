@@ -233,11 +233,12 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure middleware pipeline
-if (app.Environment.IsDevelopment())
-{
+// Configure middleware pipeline
+// if (app.Environment.IsDevelopment()) // Commented out to enable Swagger in Prod for testing
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+// }
 
 // Security headers
 app.Use(async (context, next) =>
