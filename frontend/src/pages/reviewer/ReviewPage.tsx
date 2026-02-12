@@ -231,7 +231,7 @@ export default function ReviewPage() {
             )}
 
             {/* Review Form */}
-            {((review.status !== 'Completed' && review.status !== 'Declined') || review.status === 'Returned') && (
+            {(review.status === 'Pending' || review.status === 'InProgress' || review.status === 'Returned') && (
                 <>
                     {review.status === 'Pending' ? (
                         <div className="card text-center py-8">

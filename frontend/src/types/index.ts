@@ -118,6 +118,7 @@ export interface Research {
     };
     decision?: Decision;
     submitterName?: string;
+    authorName?: string; // Added for Chairman view
 }
 
 export interface ResearchCreateRequest {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { ArrowLeft, User, Calendar, Tag, Globe } from 'lucide-react';
+import { ArrowLeft, User, Calendar, Globe } from 'lucide-react';
 import { researchApi } from '../../api/services';
 import { Research } from '../../types';
 

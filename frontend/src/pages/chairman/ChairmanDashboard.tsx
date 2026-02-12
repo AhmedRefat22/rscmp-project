@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle, XCircle, Clock, FileText, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
 import { dashboardApi } from '../../api/services';
 import { ChairmanDashboard as ChairmanDashboardType } from '../../types';
 import { handleApiError } from '../../utils/errorHandler';

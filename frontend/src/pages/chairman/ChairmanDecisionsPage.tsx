@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileText, AlertCircle, Filter, Search } from 'lucide-react';
+import { FileText, AlertCircle } from 'lucide-react';
 import { researchApi } from '../../api/services';
 import { Research, PagedResult } from '../../types';
 import toast from 'react-hot-toast';
@@ -14,7 +14,6 @@ export default function ChairmanDecisionsPage() {
 
     // Get filters from URL
     const statusFilter = searchParams.get('status') || '';
-    const searchQuery = searchParams.get('q') || '';
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,8 +67,8 @@ export default function ChairmanDecisionsPage() {
                             key={status}
                             onClick={() => handleFilterChange(status)}
                             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${(statusFilter === status || (status === 'All' && !statusFilter))
-                                    ? 'bg-primary-600 text-white'
-                                    : 'bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-600'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-600'
                                 }`}
                         >
                             {status === 'All' ? t('common.all') : t(`research.status.${status.toLowerCase()}`)}
@@ -108,9 +107,9 @@ export default function ChairmanDecisionsPage() {
                                                 {research.authorName}
                                             </span>
                                             <span className={`badge ${research.status === 'Approved' ? 'badge-success' :
-                                                    research.status === 'Rejected' ? 'badge-danger' :
-                                                        research.status === 'RevisionRequired' ? 'badge-warning' :
-                                                            'badge-primary'
+                                                research.status === 'Rejected' ? 'badge-danger' :
+                                                    research.status === 'RevisionRequired' ? 'badge-warning' :
+                                                        'badge-primary'
                                                 }`}>
                                                 {t(`research.status.${research.status.toLowerCase()}`)}
                                             </span>

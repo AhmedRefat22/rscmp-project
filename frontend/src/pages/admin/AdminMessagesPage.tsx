@@ -3,17 +3,15 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import {
     MessageSquare,
-    Search,
     Mail,
     User,
-    CheckCircle,
     Clock,
     Reply
 } from 'lucide-react';
 import { adminApi } from '../../api/services';
 
 export default function AdminMessagesPage() {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const [messages, setMessages] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
