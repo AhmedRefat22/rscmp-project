@@ -62,8 +62,10 @@ public class DecisionsController : ControllerBase
     {
         var research = await _context.Researches
             .Include(r => r.Conference)
+                .ThenInclude(c => c.ReviewCriteria)
             .Include(r => r.Submitter)
             .Include(r => r.Authors)
+            .Include(r => r.Files)
             .Include(r => r.Reviews.Where(rv => !rv.IsDeleted))
                 .ThenInclude(rv => rv.Reviewer)
             .Include(r => r.Reviews.Where(rv => !rv.IsDeleted))
@@ -79,18 +81,33 @@ public class DecisionsController : ControllerBase
 
         var response = new
         {
-            Research = _mapper.Map<ResearchDto>(research),
+            Research = new
+            {
+                research.Id,
+                research.TitleEn,
+                research.TitleAr,
+                research.AbstractEn,
+                research.AbstractAr,
+                research.SubmissionNumber,
+                research.Status,
+                ConferenceName = research.Conference?.NameEn
+            },
             Reviews = completedReviews.Select(r => new
             {
                 r.Id,
                 ReviewerName = r.Reviewer.FullNameEn,
                 r.OverallScore,
-                r.Recommendation,
+                Recommendation = r.Recommendation.ToString(),
                 r.CommentsToChairman,
+                r.CommentsToAuthor,
                 r.CompletedAt,
+                Status = r.Status.ToString(),
+                r.IsChairApproved,
                 Scores = r.Scores.Select(s => new
                 {
-                    CriteriaName = s.Criteria.NameEn,
+                    CriteriaId = s.CriteriaId,
+                    CriteriaNameEn = s.Criteria.NameEn,
+                    CriteriaNameAr = s.Criteria.NameAr,
                     s.Score,
                     MaxScore = s.Criteria.MaxScore,
                     s.Comment
@@ -133,7 +150,9 @@ public class DecisionsController : ControllerBase
         if (research.Decision != null)
             return BadRequest(new { message = "Decision already made | تم اتخاذ القرار بالفعل" });
 
-        if (research.Status != ResearchStatus.ReviewCompleted)
+        if (research.Status != ResearchStatus.ReviewCompleted && 
+            research.Status != ResearchStatus.Submitted &&
+            research.Status != ResearchStatus.UnderReview)
             return BadRequest(new { message = "Research is not ready for decision | البحث غير جاهز للقرار" });
 
         var decision = new ChairmanDecision

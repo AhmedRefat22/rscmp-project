@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
     FileText,
@@ -17,6 +17,7 @@ import { Research, Conference } from '../../types';
 
 export default function AdminSubmissionsPage() {
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const [researches, setResearches] = useState<Research[]>([]);
     const [conferences, setConferences] = useState<Conference[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -158,7 +159,7 @@ export default function AdminSubmissionsPage() {
                                     <tr
                                         key={research.id}
                                         className="hover:bg-secondary-50 dark:hover:bg-secondary-700/30 cursor-pointer transition-colors"
-                                        onClick={() => window.location.href = `/research/${research.id}`}
+                                        onClick={() => navigate(`/admin/submissions/${research.id}`)}
                                     >
                                         <td className="font-medium">
                                             <div className="max-w-md truncate">
@@ -170,7 +171,7 @@ export default function AdminSubmissionsPage() {
                                         <td>{getStatusBadge(research.status)}</td>
                                         <td>
                                             <Link
-                                                to={`/research/${research.id}`}
+                                                to={`/admin/submissions/${research.id}`}
                                                 className="btn-ghost btn-sm"
                                                 onClick={(e) => e.stopPropagation()}
                                             >

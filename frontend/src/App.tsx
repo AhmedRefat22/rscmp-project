@@ -196,6 +196,7 @@ function App() {
                 <Route path="conferences/new" element={<AddConferencePage />} />
                 <Route path="conferences/:id" element={<ConferenceDetail />} />
                 <Route path="submissions" element={<AdminSubmissionsPage />} />
+                <Route path="submissions/:id" element={<SubmissionDetail />} />
                 <Route path="messages" element={<AdminMessagesPage />} />
                 <Route path="settings" element={<SettingsPage />} />
             </Route>
@@ -212,6 +213,7 @@ function App() {
                 <Route index element={<UserDashboard />} />
                 <Route path="list" element={<MySubmissions />} />
                 <Route path="new" element={<NewSubmission />} />
+                <Route path="edit/:id" element={<NewSubmission />} />
                 <Route path=":id" element={<SubmissionDetail />} />
             </Route>
 

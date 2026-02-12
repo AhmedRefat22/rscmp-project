@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
-import { Mail, Lock, Eye, EyeOff, UserPlus, User, Building, Phone } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, UserPlus, User, Building } from 'lucide-react';
 import { authApi } from '../../api/services';
 import { useAuthStore } from '../../store/authStore';
-import { RegisterRequest } from '../../types';
+import PhoneInput from '../../components/common/PhoneInput';
 
 const registerSchema = z.object({
     email: z.string().email('Invalid email | البريد الإلكتروني غير صالح'),
@@ -36,19 +36,24 @@ export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>({
+    const { register, handleSubmit, control, formState: { errors } } = useForm<any>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             preferredLanguage: i18n.language === 'ar' ? 'Arabic' : 'English',
         },
     });
 
-    const onSubmit = async (data: RegisterRequest) => {
+    const onSubmit = async (data: any) => {
         setIsLoading(true);
         try {
             // Backend expects 0 (English) or 1 (Arabic), or "English"/"Arabic" strings with the converter.
-            // Using "English"/"Arabic" as defined in the updated schema.
-            const response = await authApi.register(data);
+            // Backend expects 'en' (English) or 'ar' (Arabic) as per RegisterRequest type.
+            // Our form uses "English"/"Arabic".
+            const payload = {
+                ...data,
+                preferredLanguage: data.preferredLanguage === 'English' ? 'en' : 'ar'
+            };
+            const response = await authApi.register(payload);
             login(response.user, response.accessToken, response.refreshToken);
             toast.success(t('common.success'));
             navigate('/my-submissions');
@@ -103,8 +108,8 @@ export default function RegisterPage() {
                                         dir="ltr"
                                     />
                                 </div>
-                                {errors.fullNameEn && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.fullNameEn.message}</p>
+                                {!!errors.fullNameEn && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.fullNameEn.message as string}</p>
                                 )}
                             </div>
 
@@ -122,8 +127,8 @@ export default function RegisterPage() {
                                         dir="rtl"
                                     />
                                 </div>
-                                {errors.fullNameAr && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.fullNameAr.message}</p>
+                                {!!errors.fullNameAr && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.fullNameAr.message as string}</p>
                                 )}
                             </div>
                         </div>
@@ -142,8 +147,8 @@ export default function RegisterPage() {
                                     dir="ltr"
                                 />
                             </div>
-                            {errors.email && (
-                                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                            {!!errors.email && (
+                                <p className="text-red-500 text-sm mt-1">{errors.email.message as string}</p>
                             )}
                         </div>
 
@@ -152,18 +157,25 @@ export default function RegisterPage() {
                                 {t('auth.register.phoneNumber')}
                             </label>
                             <div className="relative">
-                                <Phone className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-                                <input
-                                    type="tel"
-                                    {...register('phoneNumber')}
-                                    className={`input ps-10 ${errors.phoneNumber ? 'input-error' : ''}`}
-                                    placeholder="+20 123 456 7890"
-                                    dir="ltr"
+                                {/* Phone Icon removed or handled inside PhoneInput? PhoneInput doesn't have icon prop but has placeholder for it? 
+                                    My PhoneInput implementation has a vertical separator. I should probably not wrap it in relative div with icon 
+                                    OR pass icon to it?
+                                    The previous design had a Phone icon. My component doesn't take an icon.
+                                    I'll just use the component. It looks like a select+input.
+                                */}
+                                <Controller
+                                    name="phoneNumber"
+                                    control={control}
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <PhoneInput
+                                            value={value}
+                                            onChange={onChange}
+                                            error={error?.message}
+                                            placeholder="+20 123 456 7890"
+                                        />
+                                    )}
                                 />
                             </div>
-                            {errors.phoneNumber && (
-                                <p className="text-red-500 text-sm mt-1">{errors.phoneNumber.message}</p>
-                            )}
                         </div>
 
                         <div>
@@ -203,8 +215,8 @@ export default function RegisterPage() {
                                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                     </button>
                                 </div>
-                                {errors.password && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                                {!!errors.password && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.password.message as string}</p>
                                 )}
                             </div>
 
@@ -222,8 +234,8 @@ export default function RegisterPage() {
                                         dir="ltr"
                                     />
                                 </div>
-                                {errors.confirmPassword && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+                                {!!errors.confirmPassword && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message as string}</p>
                                 )}
                             </div>
                         </div>

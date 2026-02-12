@@ -16,6 +16,8 @@ public class Review : BaseEntity
     public DateTime? StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public DateTime? DueDate { get; set; }
+    public string? ChairmanFeedback { get; set; }
+    public bool IsChairApproved { get; set; } = false;
 
     // Navigation properties
     public virtual Research Research { get; set; } = null!;

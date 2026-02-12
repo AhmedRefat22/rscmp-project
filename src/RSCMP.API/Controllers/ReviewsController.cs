@@ -36,6 +36,97 @@ public class ReviewsController : ControllerBase
     }
 
     /// <summary>
+    /// Get submitted research available for review (Reviewer)
+    /// </summary>
+    [HttpGet("available")]
+    [Authorize(Policy = "ReviewerOnly")]
+    [ProducesResponseType(typeof(IEnumerable<ResearchDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAvailableResearch()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        // Get research IDs already assigned to this reviewer
+        var assignedResearchIds = await _context.Reviews
+            .Where(r => r.ReviewerId == userId.Value && !r.IsDeleted)
+            .Select(r => r.ResearchId)
+            .ToListAsync();
+
+        // Get submitted research not yet assigned to this reviewer
+        var availableResearch = await _context.Researches
+            .Include(r => r.Conference)
+            .Include(r => r.Authors)
+            .Where(r => (r.Status == ResearchStatus.Submitted || r.Status == ResearchStatus.UnderReview)
+                        && !assignedResearchIds.Contains(r.Id)
+                        && r.SubmitterId != userId.Value)
+            .OrderByDescending(r => r.SubmittedAt)
+            .ToListAsync();
+
+        var dtos = _mapper.Map<IEnumerable<ResearchDto>>(availableResearch);
+        return Ok(dtos);
+    }
+
+    /// <summary>
+    /// Self-assign a research for review (Reviewer)
+    /// </summary>
+    [HttpPost("self-assign/{researchId}")]
+    [Authorize(Policy = "ReviewerOnly")]
+    [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SelfAssign(Guid researchId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var research = await _context.Researches
+            .Include(r => r.Conference)
+            .FirstOrDefaultAsync(r => r.Id == researchId);
+
+        if (research == null)
+            return NotFound(new { message = "Research not found | البحث غير موجود" });
+
+        if (research.SubmitterId == userId.Value)
+            return BadRequest(new { message = "You cannot review your own research | لا يمكنك مراجعة بحثك الخاص" });
+
+        // Check if already assigned
+        var existingReview = await _context.Reviews
+            .FirstOrDefaultAsync(r => r.ResearchId == researchId && r.ReviewerId == userId.Value && !r.IsDeleted);
+        if (existingReview != null)
+            return BadRequest(new { message = "You are already assigned to this research | أنت معين بالفعل لهذا البحث" });
+
+        var review = new Review
+        {
+            ResearchId = researchId,
+            ReviewerId = userId.Value,
+            Status = ReviewStatus.Pending,
+            AssignedAt = DateTime.UtcNow,
+            DueDate = research.Conference.ReviewDeadline
+        };
+
+        _context.Reviews.Add(review);
+
+        // Update research status to UnderReview if it was just Submitted
+        if (research.Status == ResearchStatus.Submitted)
+        {
+            research.Status = ResearchStatus.UnderReview;
+        }
+
+        await _context.SaveChangesAsync();
+        await _auditService.LogAsync("SelfAssignReview", "Review", review.Id, newValues: new { researchId });
+
+        // Reload with includes
+        review = await _context.Reviews
+            .Include(r => r.Research)
+            .Include(r => r.Scores)
+            .FirstOrDefaultAsync(r => r.Id == review.Id);
+
+        var dto = _mapper.Map<ReviewDto>(review);
+        return Ok(dto);
+    }
+
+    /// <summary>
     /// Get my pending reviews (Reviewer)
     /// </summary>
     [HttpGet("pending")]
@@ -241,7 +332,10 @@ public class ReviewsController : ControllerBase
                 return BadRequest(new { message = $"Missing score for: {criteria.NameEn} | الدرجة مطلوبة لـ: {criteria.NameAr}" });
         }
 
-        // Save scores
+        // Save scores (Clear existing if re-submitting)
+        var existingScores = await _context.ReviewScores.Where(rs => rs.ReviewId == id).ToListAsync();
+        _context.ReviewScores.RemoveRange(existingScores);
+
         foreach (var scoreRequest in request.Scores)
         {
             var criteria = review.Research.Conference.ReviewCriteria.FirstOrDefault(c => c.Id == scoreRequest.CriteriaId);
@@ -277,6 +371,7 @@ public class ReviewsController : ControllerBase
         review.Recommendation = request.Recommendation;
         review.Status = ReviewStatus.Completed;
         review.CompletedAt = DateTime.UtcNow;
+        review.IsChairApproved = false; // Reset approval on new submission
 
         await _context.SaveChangesAsync();
         await _auditService.LogAsync("SubmitReview", "Review", id, newValues: new { review.OverallScore, review.Recommendation });
@@ -290,17 +385,21 @@ public class ReviewsController : ControllerBase
         var completedReviews = allReviews.Count(r => r.Status == ReviewStatus.Completed);
         if (completedReviews >= research.Conference.MinReviewersPerPaper)
         {
-            research.Status = ResearchStatus.ReviewCompleted;
-            await _context.SaveChangesAsync();
+            // Only update research status if it's not already in a final state
+            if (research.Status == ResearchStatus.UnderReview || research.Status == ResearchStatus.Submitted)
+            {
+                research.Status = ResearchStatus.ReviewCompleted;
+                await _context.SaveChangesAsync();
+            }
 
             // Notify chairman
             await _notificationService.SendToRoleAsync(
                 "Chairman",
-                "Research Ready for Decision",
-                "البحث جاهز للقرار",
-                $"Research '{research.TitleEn}' has completed review and is ready for decision",
-                $"البحث '{research.TitleAr}' أكمل المراجعة وجاهز للقرار",
-                $"/chairman/decisions/{research.Id}"
+                "Review Submitted",
+                "تم تقديم مراجعة",
+                $"A review for '{research.TitleEn}' has been submitted/updated",
+                $"تم تقديم/تحديث مراجعة للبحث '{research.TitleAr}'",
+                $"/chairman/research/{research.Id}"
             );
         }
 
@@ -310,6 +409,64 @@ public class ReviewsController : ControllerBase
             .Include(r => r.Scores)
                 .ThenInclude(s => s.Criteria)
             .FirstOrDefaultAsync(r => r.Id == id);
+
+        var dto = _mapper.Map<ReviewDto>(review);
+        return Ok(dto);
+    }
+
+    /// <summary>
+    /// Return review to reviewer for modification (Chairman)
+    /// </summary>
+    [HttpPost("{id}/return")]
+    [Authorize(Policy = "ChairmanOnly")]
+    [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ReturnReview(Guid id, [FromBody] string feedback)
+    {
+        var review = await _context.Reviews.FindAsync(id);
+        if (review == null)
+            return NotFound(new { message = "Review not found | المراجعة غير موجودة" });
+
+        if (string.IsNullOrWhiteSpace(feedback))
+            return BadRequest(new { message = "Feedback is required | الملاحظات مطلوبة" });
+
+        review.Status = ReviewStatus.Returned;
+        review.ChairmanFeedback = feedback;
+        review.IsChairApproved = false;
+
+        await _context.SaveChangesAsync();
+        await _auditService.LogAsync("ReturnReview", "Review", id, additionalInfo: feedback);
+
+        // Notify reviewer
+        await _notificationService.SendAsync(
+            review.ReviewerId,
+            "Review Returned",
+            "إعادة المراجعة",
+            "The chairman has returned your review for modification.",
+            "قام رئيس اللجنة بإعادة مراجعتك للتعديل.",
+            $"/reviewer/reviews/{review.Id}"
+        );
+
+        var dto = _mapper.Map<ReviewDto>(review);
+        return Ok(dto);
+    }
+
+    /// <summary>
+    /// Approve review to be visible to researcher (Chairman)
+    /// </summary>
+    [HttpPost("{id}/approve")]
+    [Authorize(Policy = "ChairmanOnly")]
+    [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ApproveReview(Guid id)
+    {
+        var review = await _context.Reviews.FindAsync(id);
+        if (review == null)
+            return NotFound(new { message = "Review not found | المراجعة غير موجودة" });
+
+        review.IsChairApproved = true;
+        
+        await _context.SaveChangesAsync();
+        await _auditService.LogAsync("ApproveReview", "Review", id);
 
         var dto = _mapper.Map<ReviewDto>(review);
         return Ok(dto);

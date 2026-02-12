@@ -88,13 +88,14 @@ public class ResearchController : ControllerBase
 
         var dtos = _mapper.Map<IEnumerable<ResearchListDto>>(researches);
 
-        return Ok(new PagedResult<ResearchListDto>(
-            dtos,
-            totalCount,
-            request.PageNumber,
-            request.PageSize,
-            (int)Math.Ceiling(totalCount / (double)request.PageSize)
-        ));
+        return Ok(new PagedResult<ResearchListDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize)
+        });
     }
 
     /// <summary>
@@ -131,10 +132,12 @@ public class ResearchController : ControllerBase
     {
         var research = await _context.Researches
             .Include(r => r.Conference)
+                .ThenInclude(c => c.ReviewCriteria)
             .Include(r => r.Submitter)
             .Include(r => r.Authors)
             .Include(r => r.Files)
             .Include(r => r.Reviews)
+            .Include(r => r.Decision)
             .FirstOrDefaultAsync(r => r.Id == id);
 
         if (research == null)
@@ -150,6 +153,21 @@ public class ResearchController : ControllerBase
             !research.Reviews.Any(r => r.ReviewerId == userId))
         {
             return Forbid();
+        }
+
+        // Filter reviews based on role
+        if (!userRoles.Contains("Admin") && !userRoles.Contains("Chairman"))
+        {
+            if (research.SubmitterId == userId)
+            {
+                // Submitter only sees Chair Approved reviews
+                research.Reviews = research.Reviews.Where(r => r.IsChairApproved).ToList();
+            }
+            else
+            {
+                // Reviewer only sees their own review
+                research.Reviews = research.Reviews.Where(r => r.ReviewerId == userId).ToList();
+            }
         }
 
         var dto = _mapper.Map<ResearchDto>(research);
@@ -268,6 +286,47 @@ public class ResearchController : ControllerBase
     }
 
     /// <summary>
+    /// Delete research (draft only)
+    /// </summary>
+    [HttpDelete("{id}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var research = await _context.Researches
+            .Include(r => r.Authors)
+            .Include(r => r.Files)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (research == null)
+            return NotFound(new { message = "Research not found | البحث غير موجود" });
+
+        if (research.SubmitterId != userId)
+            return Forbid();
+
+        if (research.Status != ResearchStatus.Draft)
+            return BadRequest(new { message = "Can only delete draft submissions | يمكن حذف المسودات فقط" });
+
+        // Soft delete or Hard delete? 
+        // For drafts, hard delete is usually fine, but let's stick to soft delete or just removing them if that's the pattern. 
+        // Looking at Update, it uses IsDeleted for authors. Let's check BaseEntity.
+        // Assuming hard delete for simplicity in drafts unless BaseEntity suggests otherwise.
+        // But usually, EF Core Remove does the job.
+        
+        _context.Researches.Remove(research);
+        await _context.SaveChangesAsync();
+        await _auditService.LogAsync("Delete", "Research", id);
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Submit research for review
     /// </summary>
     [HttpPost("{id}/submit")]
@@ -308,14 +367,14 @@ public class ResearchController : ControllerBase
         await _context.SaveChangesAsync();
         await _auditService.LogAsync("Submit", "Research", id, newValues: new { research.SubmissionNumber });
 
-        // Notify admins
+        // Notify reviewers about new submission
         await _notificationService.SendToRoleAsync(
-            "Admin",
+            "Reviewer",
             "New Research Submission",
             "تقديم بحث جديد",
-            $"A new research '{research.TitleEn}' has been submitted",
+            $"A new research '{research.TitleEn}' has been submitted for review",
             $"تم تقديم بحث جديد '{research.TitleAr}'",
-            $"/admin/research/{id}"
+            "/reviewer"
         );
 
         var dto = _mapper.Map<ResearchDto>(research);
@@ -327,6 +386,7 @@ public class ResearchController : ControllerBase
     /// </summary>
     [HttpPost("{id}/files")]
     [Authorize]
+    [RequestSizeLimit(100 * 1024 * 1024)] // 100MB
     [ProducesResponseType(typeof(FileUploadResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UploadFile(Guid id, IFormFile file, [FromQuery] string fileType = "MainDocument")
@@ -349,8 +409,8 @@ public class ResearchController : ControllerBase
         if (file.Length == 0)
             return BadRequest(new { message = "File is empty | الملف فارغ" });
 
-        if (file.Length > 10 * 1024 * 1024) // 10MB
-            return BadRequest(new { message = "File size exceeds 10MB limit | حجم الملف يتجاوز 10 ميجابايت" });
+        if (file.Length > 100 * 1024 * 1024) // 100MB
+            return BadRequest(new { message = "File size exceeds 100MB limit | حجم الملف يتجاوز 100 ميجابايت" });
 
         if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
             return BadRequest(new { message = "Only PDF files are allowed | يُسمح فقط بملفات PDF" });

@@ -199,12 +199,13 @@ public class DashboardController : ControllerBase
 
         var pendingReviews = reviews.Where(r => r.Status == ReviewStatus.Pending || r.Status == ReviewStatus.InProgress).ToList();
 
-        var dashboard = new ReviewerDashboardDto(
-            PendingReviews: pendingReviews.Count,
-            CompletedReviews: reviews.Count(r => r.Status == ReviewStatus.Completed),
-            TotalAssigned: reviews.Count,
-            UpcomingReviews: _mapper.Map<IEnumerable<ReviewDto>>(pendingReviews.OrderBy(r => r.DueDate).Take(5))
-        );
+        var dashboard = new ReviewerDashboardDto
+        {
+            PendingReviews = pendingReviews.Count,
+            CompletedReviews = reviews.Count(r => r.Status == ReviewStatus.Completed),
+            TotalAssigned = reviews.Count,
+            UpcomingReviews = _mapper.Map<IEnumerable<ReviewDto>>(pendingReviews.OrderBy(r => r.DueDate).Take(5))
+        };
 
         return Ok(dashboard);
     }
@@ -224,13 +225,14 @@ public class DashboardController : ControllerBase
 
         var pendingDecisions = researches.Where(r => r.Status == ResearchStatus.ReviewCompleted).ToList();
 
-        var dashboard = new ChairmanDashboardDto(
-            PendingDecisions: pendingDecisions.Count,
-            ApprovedResearches: researches.Count(r => r.Status == ResearchStatus.Approved),
-            RejectedResearches: researches.Count(r => r.Status == ResearchStatus.Rejected),
-            TotalResearches: researches.Count,
-            PendingResearches: _mapper.Map<IEnumerable<ResearchListDto>>(pendingDecisions.OrderBy(r => r.SubmittedAt).Take(10))
-        );
+        var dashboard = new ChairmanDashboardDto
+        {
+            PendingDecisions = pendingDecisions.Count,
+            ApprovedResearches = researches.Count(r => r.Status == ResearchStatus.Approved),
+            RejectedResearches = researches.Count(r => r.Status == ResearchStatus.Rejected),
+            TotalResearches = researches.Count,
+            PendingResearches = _mapper.Map<IEnumerable<ResearchListDto>>(pendingDecisions.OrderBy(r => r.SubmittedAt).Take(10))
+        };
 
         return Ok(dashboard);
     }

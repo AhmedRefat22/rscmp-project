@@ -219,17 +219,18 @@ public class ConferencesController : ControllerBase
         var researches = conference.Researches.Where(r => !r.IsDeleted).ToList();
         var reviews = researches.SelectMany(r => r.Reviews.Where(rv => !rv.IsDeleted)).ToList();
 
-        var stats = new ConferenceStatisticsDto(
-            ConferenceId: id,
-            ConferenceName: conference.NameEn,
-            TotalSubmissions: researches.Count,
-            UnderReview: researches.Count(r => r.Status == ResearchStatus.UnderReview),
-            Approved: researches.Count(r => r.Status == ResearchStatus.Approved),
-            Rejected: researches.Count(r => r.Status == ResearchStatus.Rejected),
-            AverageReviewScore: reviews.Where(r => r.OverallScore.HasValue).Select(r => r.OverallScore!.Value).DefaultIfEmpty().Average(),
-            CompletedReviews: reviews.Count(r => r.Status == ReviewStatus.Completed),
-            PendingReviews: reviews.Count(r => r.Status == ReviewStatus.Pending || r.Status == ReviewStatus.InProgress)
-        );
+        var stats = new ConferenceStatisticsDto
+        {
+            ConferenceId = id,
+            ConferenceName = conference.NameEn,
+            TotalSubmissions = researches.Count,
+            UnderReview = researches.Count(r => r.Status == ResearchStatus.UnderReview),
+            Approved = researches.Count(r => r.Status == ResearchStatus.Approved),
+            Rejected = researches.Count(r => r.Status == ResearchStatus.Rejected),
+            AverageReviewScore = reviews.Where(r => r.OverallScore.HasValue).Select(r => r.OverallScore!.Value).DefaultIfEmpty().Average(),
+            CompletedReviews = reviews.Count(r => r.Status == ReviewStatus.Completed),
+            PendingReviews = reviews.Count(r => r.Status == ReviewStatus.Pending || r.Status == ReviewStatus.InProgress)
+        };
 
         return Ok(stats);
     }

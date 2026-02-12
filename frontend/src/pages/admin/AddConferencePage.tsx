@@ -16,7 +16,7 @@ const conferenceSchema = z.object({
     location: z.string().min(2, 'Location is required'),
     startDate: z.string().min(1, 'Start date is required'),
     endDate: z.string().min(1, 'End date is required'),
-    submissionDeadline: z.string().min(1, 'Submission deadline is required'),
+    // submissionDeadline: z.string().min(1, 'Submission deadline is required'), // Removed - using EndDate
     website: z.string().url('Invalid URL').optional().or(z.literal('')),
     // Files
     bannerImage: z.any().optional(),
@@ -57,7 +57,7 @@ export default function AddConferencePage() {
             formData.append('location', data.location);
             formData.append('startDate', data.startDate);
             formData.append('endDate', data.endDate);
-            formData.append('submissionDeadline', data.submissionDeadline);
+            formData.append('submissionDeadline', data.endDate); // Default to end date
             if (data.website) formData.append('website', data.website);
 
             if (data.bannerImage && data.bannerImage.length > 0) {
@@ -156,7 +156,7 @@ export default function AddConferencePage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
-                                {i18n.language === 'ar' ? 'الموقع الإلكتروني' : 'Website'}
+                                {i18n.language === 'ar' ? 'الموقع الإلكتروني (اختياري)' : 'Website (Optional)'}
                             </label>
                             <div className="relative">
                                 <Globe className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
@@ -199,27 +199,13 @@ export default function AddConferencePage() {
                             </div>
                             {errors.endDate && <p className="text-red-500 text-sm mt-1">{errors.endDate.message}</p>}
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
-                                {i18n.language === 'ar' ? 'معدل التقديم' : 'Submission Deadline'}
-                            </label>
-                            <div className="relative">
-                                <Calendar className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-                                <input
-                                    type="date"
-                                    {...register('submissionDeadline')}
-                                    className={`input ps-10 ${errors.submissionDeadline ? 'input-error' : ''}`}
-                                />
-                            </div>
-                            {errors.submissionDeadline && <p className="text-red-500 text-sm mt-1">{errors.submissionDeadline.message}</p>}
-                        </div>
                     </div>
 
                     {/* Images */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
-                                {i18n.language === 'ar' ? 'صورة شعار المؤتمر' : 'Conference Logo'}
+                                {i18n.language === 'ar' ? 'صورة شعار المؤتمر (اختياري)' : 'Conference Logo (Optional)'}
                             </label>
                             <div className="relative">
                                 <ImageIcon className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />

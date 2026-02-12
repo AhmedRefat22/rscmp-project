@@ -12,6 +12,7 @@ using RSCMP.Application.Interfaces;
 using RSCMP.Application.Mappings;
 using RSCMP.Application.Validators;
 using RSCMP.Domain.Entities;
+using RSCMP.Domain.Enums;
 using RSCMP.Domain.Interfaces;
 using RSCMP.Infrastructure.Data;
 using RSCMP.Infrastructure.Repositories;
@@ -275,18 +276,13 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
         
-        // Database will persist between restarts now
-        // Uncomment below to reset database if needed
-        /*
-        if (app.Environment.IsDevelopment())
-        {
-            await context.Database.EnsureDeletedAsync();
-            Log.Information("Database deleted for fresh seeding");
-        }
-        */
+        // Database has been reset with Chairman@gmail.com and Reviewer@gmail.com
+        // Uncomment below ONLY if you need to reset the database again
+        // await context.Database.EnsureDeletedAsync();
+        // Log.Information("Database deleted for fresh seed data");
         
-        await context.Database.EnsureCreatedAsync();
-        Log.Information("Database created/ensured");
+        await context.Database.MigrateAsync();
+        Log.Information("Database migrated successfully");
         
         await SeedDataAsync(userManager, roleManager, context);
     }
@@ -326,7 +322,7 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
             FullNameEn = "System Administrator",
             FullNameAr = "مدير النظام",
             EmailConfirmed = true,
-            PreferredLanguage = RSCMP.Domain.Enums.Language.English
+            PreferredLanguage = Language.English
         };
         
         var result = await userManager.CreateAsync(admin, "Admin@123456");
@@ -351,7 +347,7 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
             FullNameEn = "Ahmed Refat",
             FullNameAr = "أحمد رفعت",
             EmailConfirmed = true,
-            PreferredLanguage = RSCMP.Domain.Enums.Language.Arabic
+            PreferredLanguage = Language.Arabic
         };
         
         var result = await userManager.CreateAsync(customAdmin, "123456");
@@ -361,6 +357,27 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
         }
 
         await userManager.AddToRolesAsync(customAdmin, new[] { "Admin", "Chairman", "Reviewer", "Public" });
+    }
+
+    // Seed Additional Admin User (Requested by User)
+    var newAdminEmail = "Admin@gmail.com";
+    if (await userManager.FindByEmailAsync(newAdminEmail) == null)
+    {
+        var newAdmin = new ApplicationUser
+        {
+            UserName = newAdminEmail,
+            Email = newAdminEmail,
+            FullNameEn = "System Admin",
+            FullNameAr = "مدير النظام",
+            EmailConfirmed = true,
+            PreferredLanguage = Language.Arabic
+        };
+        
+        var result = await userManager.CreateAsync(newAdmin, "123456");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRolesAsync(newAdmin, new[] { "Admin", "Chairman", "Reviewer", "Public" });
+        }
     }
 
     // Seed Custom User (Requested by User)
@@ -375,7 +392,7 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
             FullNameEn = "Mohamed",
             FullNameAr = "محمد",
             EmailConfirmed = true,
-            PreferredLanguage = RSCMP.Domain.Enums.Language.Arabic
+            PreferredLanguage = Language.Arabic
         };
         
         var result = await userManager.CreateAsync(moUser, "123456");
@@ -399,14 +416,14 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
             FullNameAr = "رئيس المؤتمر",
             Institution = "Cairo University",
             EmailConfirmed = true,
-            PreferredLanguage = RSCMP.Domain.Enums.Language.Arabic
+            PreferredLanguage = Language.Arabic
         };
         
         await userManager.CreateAsync(chairman, "Chairman@123456");
         await userManager.AddToRolesAsync(chairman, new[] { "Chairman", "Reviewer", "Public" });
     }
 
-    // Seed Reviewer User
+    // Seed Reviewer User (reviewer@rscmp.com)
     var reviewerEmail = "reviewer@rscmp.com";
     if (await userManager.FindByEmailAsync(reviewerEmail) == null)
     {
@@ -418,11 +435,55 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
             FullNameAr = "مراجع الأبحاث",
             Institution = "Alexandria University",
             EmailConfirmed = true,
-            PreferredLanguage = RSCMP.Domain.Enums.Language.English
+            PreferredLanguage = Language.English
         };
         
         await userManager.CreateAsync(reviewer, "Reviewer@123456");
         await userManager.AddToRolesAsync(reviewer, new[] { "Reviewer", "Public" });
+    }
+
+    // Seed Reviewer User (Reviewer@gmail.com)
+    var reviewerGmailEmail = "Reviewer@gmail.com";
+    if (await userManager.FindByEmailAsync(reviewerGmailEmail) == null)
+    {
+        var reviewerGmail = new ApplicationUser
+        {
+            UserName = reviewerGmailEmail,
+            Email = reviewerGmailEmail,
+            FullNameEn = "Reviewer",
+            FullNameAr = "المراجع",
+            Institution = "Cairo University",
+            EmailConfirmed = true,
+            PreferredLanguage = Language.Arabic
+        };
+        
+        var result = await userManager.CreateAsync(reviewerGmail, "123456");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRolesAsync(reviewerGmail, new[] { "Reviewer", "Public" });
+        }
+    }
+
+    // Seed Chairman User (Chairman@gmail.com)
+    var chairmanGmailEmail = "Chairman@gmail.com";
+    if (await userManager.FindByEmailAsync(chairmanGmailEmail) == null)
+    {
+        var chairmanGmail = new ApplicationUser
+        {
+            UserName = chairmanGmailEmail,
+            Email = chairmanGmailEmail,
+            FullNameEn = "Chairman",
+            FullNameAr = "رئيس اللجنة",
+            Institution = "Cairo University",
+            EmailConfirmed = true,
+            PreferredLanguage = Language.Arabic
+        };
+        
+        var result = await userManager.CreateAsync(chairmanGmail, "123456");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRolesAsync(chairmanGmail, new[] { "Chairman", "Public" });
+        }
     }
 
     // Seed Regular User
@@ -437,7 +498,7 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
             FullNameAr = "جون الباحث",
             Institution = "Ain Shams University",
             EmailConfirmed = true,
-            PreferredLanguage = RSCMP.Domain.Enums.Language.English
+            PreferredLanguage = Language.English
         };
         
         await userManager.CreateAsync(user, "User@123456");
@@ -480,11 +541,9 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
 
         // Add Review Criteria
         context.ReviewCriteria.AddRange(
-            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "Originality", NameAr = "الأصالة", DescriptionEn = "Novelty and originality of the research", DescriptionAr = "حداثة وأصالة البحث", MaxScore = 10, Order = 1 },
-            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "Methodology", NameAr = "المنهجية", DescriptionEn = "Appropriateness and rigor of research methodology", DescriptionAr = "ملاءمة ودقة منهجية البحث", MaxScore = 10, Order = 2 },
-            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "Clarity", NameAr = "الوضوح", DescriptionEn = "Clarity and organization of presentation", DescriptionAr = "وضوح وتنظيم العرض", MaxScore = 10, Order = 3 },
-            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "Significance", NameAr = "الأهمية", DescriptionEn = "Significance and impact of the research", DescriptionAr = "أهمية وتأثير البحث", MaxScore = 10, Order = 4 },
-            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "References", NameAr = "المراجع", DescriptionEn = "Quality and relevance of references", DescriptionAr = "جودة وملاءمة المراجع", MaxScore = 10, Order = 5 }
+            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "Originality", NameAr = "أصالة العمل", DescriptionEn = "Novelty and originality of the work", DescriptionAr = "حداثة وأصالة العمل", MaxScore = 10, MinScore = 1, Order = 1 },
+            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "Scientific Value", NameAr = "القيمة العلمية", DescriptionEn = "Scientific value and contribution", DescriptionAr = "القيمة العلمية والمساهمة", MaxScore = 10, MinScore = 1, Order = 2 },
+            new ReviewCriteria { ConferenceId = conference.Id, NameEn = "Relevance", NameAr = "مدى ارتباط البحث بالموضوع", DescriptionEn = "Relevance of the research to the topic", DescriptionAr = "مدى ارتباط البحث بالموضوع", MaxScore = 10, MinScore = 1, Order = 3 }
         );
 
         await context.SaveChangesAsync();

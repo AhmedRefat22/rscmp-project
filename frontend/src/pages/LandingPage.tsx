@@ -48,10 +48,38 @@ export default function LandingPage() {
                     <p className="text-lg md:text-xl text-primary-100 mb-10 max-w-3xl mx-auto">
                         {t('landing.hero.subtitle')}
                     </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+                        <div className="relative w-full max-w-md">
+                            <input
+                                type="text"
+                                placeholder={t('research.searchPlaceholder', 'Find research...')}
+                                className="w-full px-6 py-4 rounded-full text-secondary-900 bg-white/95 backdrop-blur shadow-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        const target = e.target as HTMLInputElement;
+                                        if (target.value.trim()) {
+                                            window.location.href = `#/research?search=${encodeURIComponent(target.value)}`;
+                                        }
+                                    }
+                                }}
+                            />
+                            <button
+                                className="absolute end-2 top-2 p-2 bg-primary-600 rounded-full text-white hover:bg-primary-700 transition-colors"
+                                onClick={(e) => {
+                                    const input = e.currentTarget.parentElement?.querySelector('input');
+                                    if (input?.value.trim()) {
+                                        window.location.href = `#/research?search=${encodeURIComponent(input.value)}`;
+                                    }
+                                }}
+                            >
+                                <ArrowRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link to="/register" className="btn bg-white text-primary-700 hover:bg-primary-50 px-8 py-3 text-lg">
+                        <Link to="/register" className="btn border-2 border-white text-white hover:bg-white/10 px-8 py-3 text-lg">
                             {t('landing.hero.cta.register')}
-                            <ArrowRight className="w-5 h-5 ms-2" />
                         </Link>
                         <Link to="/choose-role" className="btn border-2 border-white text-white hover:bg-white/10 px-8 py-3 text-lg">
                             {t('landing.hero.cta.login')}

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { Search, Trash2, UserPlus, X, Users, Shield, Crown } from 'lucide-react';
 import { adminApi } from '../../api/services';
 import { User, PagedResult, CreateUserByAdminRequest } from '../../types';
+import PhoneInput from '../../components/common/PhoneInput';
 
 type RoleTab = 'all' | 'Public' | 'Reviewer' | 'Chairman' | 'Admin';
 
@@ -17,7 +18,7 @@ export default function UsersPage() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
 
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateUserByAdminRequest>({
+    const { register, handleSubmit, control, reset, formState: { errors } } = useForm<CreateUserByAdminRequest>({
         defaultValues: {
             role: 'Reviewer',
             preferredLanguage: 'en',
@@ -247,7 +248,19 @@ export default function UsersPage() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">{i18n.language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</label>
-                                <input type="tel" {...register('phoneNumber', { required: true })} className={`input ${errors.phoneNumber ? 'input-error' : ''}`} dir="ltr" placeholder="+20 123 456 7890" />
+                                <Controller
+                                    name="phoneNumber"
+                                    control={control}
+                                    rules={{ required: true }}
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <PhoneInput
+                                            value={value || ''}
+                                            onChange={onChange}
+                                            error={error?.message}
+                                            placeholder="+20 123 456 7890"
+                                        />
+                                    )}
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">{i18n.language === 'ar' ? 'كلمة المرور' : 'Password'}</label>

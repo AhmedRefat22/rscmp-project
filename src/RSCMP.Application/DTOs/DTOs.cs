@@ -82,6 +82,7 @@ public class ConferenceDto
     public bool IsActive { get; set; }
     public bool AcceptingSubmissions { get; set; }
     public int ResearchCount { get; set; }
+    public List<ReviewCriteriaDto> ReviewCriteria { get; set; } = new();
 }
 public record ConferenceCreateRequest(
     string NameEn,
@@ -114,24 +115,39 @@ public record ConferenceUpdateRequest(
 );
 
 // ============ Research DTOs ============
-public record ResearchDto(
-    Guid Id,
-    Guid ConferenceId,
-    string ConferenceName,
-    string TitleEn,
-    string TitleAr,
-    string AbstractEn,
-    string AbstractAr,
-    string? Keywords,
-    string? TopicArea,
-    ResearchStatus Status,
-    string? SubmissionNumber,
-    DateTime? SubmittedAt,
-    DateTime CreatedAt,
-    IEnumerable<AuthorDto> Authors,
-    int ReviewCount,
-    double? AverageScore
-);
+public record ResearchDto
+{
+    public Guid Id { get; init; }
+    public Guid ConferenceId { get; init; }
+    public string ConferenceName { get; init; } = string.Empty;
+    public string TitleEn { get; init; } = string.Empty;
+    public string TitleAr { get; init; } = string.Empty;
+    public string AbstractEn { get; init; } = string.Empty;
+    public string AbstractAr { get; init; } = string.Empty;
+    public string? Keywords { get; init; }
+    public string? TopicArea { get; init; }
+    public ResearchStatus Status { get; init; }
+    public string? SubmissionNumber { get; init; }
+    public DateTime? SubmittedAt { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public IEnumerable<AuthorDto> Authors { get; init; } = new List<AuthorDto>();
+    public int ReviewCount { get; init; }
+    public double? AverageScore { get; init; }
+    public IEnumerable<ReviewDto>? Reviews { get; init; }
+    public IEnumerable<ResearchFileDto> Files { get; init; } = new List<ResearchFileDto>();
+    public ConferenceDto? Conference { get; init; }
+    public DecisionDto? Decision { get; init; }
+    public string SubmitterName { get; init; } = string.Empty;
+}
+
+public record ResearchFileDto
+{
+    public Guid Id { get; init; }
+    public string OriginalFileName { get; init; } = string.Empty;
+    public string ContentType { get; init; } = string.Empty;
+    public long FileSize { get; init; }
+    public string FileType { get; init; } = string.Empty;
+}
 public record ResearchCreateRequest(
     Guid ConferenceId,
     string TitleEn,
@@ -152,40 +168,44 @@ public record ResearchUpdateRequest(
     IEnumerable<AuthorCreateRequest> Authors
 );
 public record ResearchSubmitRequest(Guid ResearchId);
-public record ResearchListDto(
-    Guid Id,
-    string TitleEn,
-    string TitleAr,
-    string? SubmissionNumber,
-    ResearchStatus Status,
-    DateTime? SubmittedAt,
-    string ConferenceName,
-    int AuthorCount
-);
-public record PublicResearchDto(
-    Guid Id,
-    string TitleEn,
-    string TitleAr,
-    string AbstractEn,
-    string AbstractAr,
-    string? Keywords,
-    string ConferenceName,
-    IEnumerable<PublicAuthorDto> Authors,
-    DateTime? SubmittedAt,
-    int ViewCount,
-    int DownloadCount
-);
+public record ResearchListDto
+{
+    public Guid Id { get; init; }
+    public string TitleEn { get; init; } = string.Empty;
+    public string TitleAr { get; init; } = string.Empty;
+    public string? SubmissionNumber { get; init; }
+    public ResearchStatus Status { get; init; }
+    public DateTime? SubmittedAt { get; init; }
+    public string ConferenceName { get; init; } = string.Empty;
+    public int AuthorCount { get; init; }
+    public double? AverageScore { get; init; }
+}
+public class PublicResearchDto
+{
+    public Guid Id { get; set; }
+    public string TitleEn { get; set; } = string.Empty;
+    public string TitleAr { get; set; } = string.Empty;
+    public string AbstractEn { get; set; } = string.Empty;
+    public string AbstractAr { get; set; } = string.Empty;
+    public string? Keywords { get; set; }
+    public string ConferenceName { get; set; } = string.Empty;
+    public IEnumerable<PublicAuthorDto> Authors { get; set; } = new List<PublicAuthorDto>();
+    public DateTime? SubmittedAt { get; set; }
+    public int ViewCount { get; set; }
+    public int DownloadCount { get; set; }
+}
 
 // ============ Author DTOs ============
-public record AuthorDto(
-    Guid Id,
-    string FullName,
-    string Email,
-    string? Institution,
-    string? Country,
-    int Order,
-    bool IsCorresponding
-);
+public class AuthorDto
+{
+    public Guid Id { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Institution { get; set; }
+    public string? Country { get; set; }
+    public int Order { get; set; }
+    public bool IsCorresponding { get; set; }
+}
 public record AuthorCreateRequest(
     string FullName,
     string Email,
@@ -196,20 +216,28 @@ public record AuthorCreateRequest(
     int Order,
     bool IsCorresponding
 );
-public record PublicAuthorDto(string FullName, string? Institution, bool IsCorresponding);
+public class PublicAuthorDto
+{
+    public string FullName { get; set; } = string.Empty;
+    public string? Institution { get; set; }
+    public bool IsCorresponding { get; set; }
+}
 
 // ============ Review DTOs ============
-public record ReviewDto(
-    Guid Id,
-    Guid ResearchId,
-    string ResearchTitle,
-    ReviewStatus Status,
-    int? OverallScore,
-    DecisionType? Recommendation,
-    DateTime? DueDate,
-    DateTime? CompletedAt,
-    IEnumerable<ReviewScoreDto>? Scores
-);
+public record ReviewDto
+{
+    public Guid Id { get; init; }
+    public Guid ResearchId { get; init; }
+    public string ResearchTitle { get; init; } = string.Empty;
+    public ReviewStatus Status { get; init; }
+    public int? OverallScore { get; init; }
+    public DecisionType? Recommendation { get; init; }
+    public DateTime? DueDate { get; init; }
+    public DateTime? CompletedAt { get; init; }
+    public string? ChairmanFeedback { get; init; }
+    public bool IsChairApproved { get; init; }
+    public IEnumerable<ReviewScoreDto>? Scores { get; init; }
+}
 public record ReviewAssignRequest(Guid ResearchId, Guid ReviewerId, DateTime? DueDate);
 public record ReviewSubmitRequest(
     string? CommentsToAuthor,
@@ -217,19 +245,27 @@ public record ReviewSubmitRequest(
     DecisionType Recommendation,
     IEnumerable<ReviewScoreRequest> Scores
 );
-public record ReviewScoreDto(Guid CriteriaId, string CriteriaName, int Score, int MaxScore, string? Comment);
+public class ReviewScoreDto
+{
+    public Guid CriteriaId { get; set; }
+    public string CriteriaName { get; set; } = string.Empty;
+    public int Score { get; set; }
+    public int MaxScore { get; set; }
+    public string? Comment { get; set; }
+}
 public record ReviewScoreRequest(Guid CriteriaId, int Score, string? Comment);
-public record ReviewCriteriaDto(
-    Guid Id,
-    string NameEn,
-    string NameAr,
-    string? DescriptionEn,
-    string? DescriptionAr,
-    int MaxScore,
-    int MinScore,
-    double Weight,
-    int Order
-);
+public class ReviewCriteriaDto
+{
+    public Guid Id { get; set; }
+    public string NameEn { get; set; } = string.Empty;
+    public string NameAr { get; set; } = string.Empty;
+    public string? DescriptionEn { get; set; }
+    public string? DescriptionAr { get; set; }
+    public int MaxScore { get; set; }
+    public int MinScore { get; set; }
+    public double Weight { get; set; }
+    public int Order { get; set; }
+}
 public record ReviewCriteriaCreateRequest(
     string NameEn,
     string NameAr,
@@ -242,15 +278,17 @@ public record ReviewCriteriaCreateRequest(
 );
 
 // ============ Decision DTOs ============
-public record DecisionDto(
-    Guid Id,
-    Guid ResearchId,
-    string ResearchTitle,
-    DecisionType Decision,
-    string? Justification,
-    DateTime DecidedAt,
-    string ChairmanName
-);
+public class DecisionDto
+{
+    public Guid Id { get; set; }
+    public Guid ResearchId { get; set; }
+    public string ResearchTitle { get; set; } = string.Empty;
+    public DecisionType Decision { get; set; }
+    public string? Justification { get; set; }
+    public string? CommentsToAuthor { get; set; }
+    public DateTime DecidedAt { get; set; }
+    public string ChairmanName { get; set; } = string.Empty;
+}
 public record DecisionCreateRequest(
     Guid ResearchId,
     DecisionType Decision,
@@ -259,81 +297,101 @@ public record DecisionCreateRequest(
 );
 
 // ============ Notification DTOs ============
-public record NotificationDto(
-    Guid Id,
-    string TitleEn,
-    string TitleAr,
-    string MessageEn,
-    string MessageAr,
-    NotificationType Type,
-    string? Link,
-    bool IsRead,
-    DateTime CreatedAt
-);
+public class NotificationDto
+{
+    public Guid Id { get; set; }
+    public string TitleEn { get; set; } = string.Empty;
+    public string TitleAr { get; set; } = string.Empty;
+    public string MessageEn { get; set; } = string.Empty;
+    public string MessageAr { get; set; } = string.Empty;
+    public NotificationType Type { get; set; }
+    public string? Link { get; set; }
+    public bool IsRead { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
 
 // ============ Contact DTOs ============
-public record ContactMessageDto(
-    Guid Id,
-    string Name,
-    string Email,
-    string Subject,
-    string Message,
-    ContactMessageStatus Status,
-    DateTime CreatedAt,
-    string? Response,
-    DateTime? RespondedAt
-);
+public class ContactMessageDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Subject { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public ContactMessageStatus Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string? Response { get; set; }
+    public DateTime? RespondedAt { get; set; }
+}
 public record ContactCreateRequest(string Name, string Email, string Subject, string Message);
 public record ContactReplyRequest(Guid MessageId, string Response);
 
 // ============ Dashboard DTOs ============
-public record AdminDashboardDto(
-    int TotalConferences,
-    int ActiveConferences,
-    int TotalResearches,
-    int PendingResearches,
-    int TotalUsers,
-    int TotalReviewers,
-    int UnreadMessages,
-    IEnumerable<RecentActivityDto> RecentActivities
-);
-public record ReviewerDashboardDto(
-    int PendingReviews,
-    int CompletedReviews,
-    int TotalAssigned,
-    IEnumerable<ReviewDto> UpcomingReviews
-);
-public record ChairmanDashboardDto(
-    int PendingDecisions,
-    int ApprovedResearches,
-    int RejectedResearches,
-    int TotalResearches,
-    IEnumerable<ResearchListDto> PendingResearches
-);
-public record RecentActivityDto(string Action, string Entity, DateTime Timestamp, string? Details);
+public class AdminDashboardDto
+{
+    public int TotalConferences { get; set; }
+    public int ActiveConferences { get; set; }
+    public int TotalResearches { get; set; }
+    public int PendingResearches { get; set; }
+    public int TotalUsers { get; set; }
+    public int TotalReviewers { get; set; }
+    public int UnreadMessages { get; set; }
+    public IEnumerable<RecentActivityDto> RecentActivities { get; set; } = new List<RecentActivityDto>();
+}
+public class ReviewerDashboardDto
+{
+    public int PendingReviews { get; set; }
+    public int CompletedReviews { get; set; }
+    public int TotalAssigned { get; set; }
+    public IEnumerable<ReviewDto> UpcomingReviews { get; set; } = new List<ReviewDto>();
+}
+public class ChairmanDashboardDto
+{
+    public int PendingDecisions { get; set; }
+    public int ApprovedResearches { get; set; }
+    public int RejectedResearches { get; set; }
+    public int TotalResearches { get; set; }
+    public IEnumerable<ResearchListDto> PendingResearches { get; set; } = new List<ResearchListDto>();
+}
+public class RecentActivityDto
+{
+    public string Action { get; set; } = string.Empty;
+    public string Entity { get; set; } = string.Empty;
+    public DateTime Timestamp { get; set; }
+    public string? Details { get; set; }
+}
 
 // ============ Statistics DTOs ============
-public record ConferenceStatisticsDto(
-    Guid ConferenceId,
-    string ConferenceName,
-    int TotalSubmissions,
-    int UnderReview,
-    int Approved,
-    int Rejected,
-    double AverageReviewScore,
-    int CompletedReviews,
-    int PendingReviews
-);
+public class ConferenceStatisticsDto
+{
+    public Guid ConferenceId { get; set; }
+    public string ConferenceName { get; set; } = string.Empty;
+    public int TotalSubmissions { get; set; }
+    public int UnderReview { get; set; }
+    public int Approved { get; set; }
+    public int Rejected { get; set; }
+    public double AverageReviewScore { get; set; }
+    public int CompletedReviews { get; set; }
+    public int PendingReviews { get; set; }
+}
 
 // ============ File DTOs ============
-public record FileUploadResponse(Guid FileId, string FileName, long FileSize, string FileType);
+public class FileUploadResponse
+{
+    public Guid FileId { get; set; }
+    public string FileName { get; set; } = string.Empty;
+    public long FileSize { get; set; }
+    public string FileType { get; set; } = string.Empty;
+}
 
 // ============ Pagination ============
-public record PagedResult<T>(
-    IEnumerable<T> Items,
-    int TotalCount,
-    int PageNumber,
-    int PageSize,
-    int TotalPages
-);
+public class PagedResult<T>
+{
+    public IEnumerable<T> Items { get; set; } = new List<T>();
+    public int TotalCount { get; set; }
+    public int PageNumber { get; set; }
+    public int PageSize { get; set; }
+    public int TotalPages { get; set; }
+}
 public record PagedRequest(int PageNumber = 1, int PageSize = 10, string? SortBy = null, bool SortDescending = false, string? Search = null);
+

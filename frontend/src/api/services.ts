@@ -139,6 +139,10 @@ export const researchApi = {
         return response.data;
     },
 
+    delete: async (id: string): Promise<void> => {
+        await api.delete(`/research/${id}`);
+    },
+
     uploadFile: async (id: string, file: File, fileType = 'MainDocument'): Promise<any> => {
         const formData = new FormData();
         formData.append('file', file);
@@ -163,6 +167,16 @@ export const researchApi = {
 
 // Reviews API
 export const reviewsApi = {
+    getAvailable: async (): Promise<Research[]> => {
+        const response = await api.get('/reviews/available');
+        return response.data;
+    },
+
+    selfAssign: async (researchId: string): Promise<Review> => {
+        const response = await api.post(`/reviews/self-assign/${researchId}`);
+        return response.data;
+    },
+
     getPending: async (): Promise<Review[]> => {
         const response = await api.get('/reviews/pending');
         return response.data;
@@ -200,6 +214,18 @@ export const reviewsApi = {
 
     decline: async (id: string, reason?: string): Promise<void> => {
         await api.post(`/reviews/${id}/decline`, reason);
+    },
+
+    return: async (id: string, feedback: string): Promise<Review> => {
+        const response = await api.post(`/reviews/${id}/return`, feedback, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+        return response.data;
+    },
+
+    approve: async (id: string): Promise<Review> => {
+        const response = await api.post(`/reviews/${id}/approve`);
+        return response.data;
     },
 };
 

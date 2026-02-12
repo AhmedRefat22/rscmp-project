@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FileText, Search, Calendar, User, Filter } from 'lucide-react';
 import { researchApi, conferencesApi } from '../../api/services';
@@ -8,6 +8,7 @@ import { handleApiError } from '../../utils/errorHandler';
 
 export default function PublicResearchPage() {
     const { t, i18n } = useTranslation();
+    const location = useLocation();
     const [researches, setResearches] = useState<Research[]>([]);
     const [conferences, setConferences] = useState<Conference[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +16,16 @@ export default function PublicResearchPage() {
     const [search, setSearch] = useState('');
 
     useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const query = params.get('search');
+        if (query) {
+            setSearch(query);
+        }
+    }, [location.search]);
+
+    useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
             try {
                 const [researchData, conferenceData] = await Promise.all([
                     researchApi.getPublic(selectedConference || undefined),

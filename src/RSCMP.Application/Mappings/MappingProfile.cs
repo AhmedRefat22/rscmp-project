@@ -20,17 +20,24 @@ public class MappingProfile : Profile
 
         // Research mappings
         CreateMap<Research, ResearchDto>()
+            .ForMember(d => d.SubmitterName, opt => opt.MapFrom(s => s.Submitter != null ? s.Submitter.FullNameEn : "Unknown"))
             .ForMember(d => d.ConferenceName, opt => opt.MapFrom(s => s.Conference.NameEn))
             .ForMember(d => d.ReviewCount, opt => opt.MapFrom(s => s.Reviews.Count(r => !r.IsDeleted)))
             .ForMember(d => d.AverageScore, opt => opt.MapFrom(s => 
                 s.Reviews.Where(r => r.Status == Domain.Enums.ReviewStatus.Completed && r.OverallScore.HasValue)
                     .Select(r => r.OverallScore!.Value)
                     .DefaultIfEmpty()
-                    .Average()));
+                    .Average()))
+            .ForMember(d => d.Reviews, opt => opt.MapFrom(s => s.Reviews ?? new List<Review>()));
         
         CreateMap<Research, ResearchListDto>()
             .ForMember(d => d.ConferenceName, opt => opt.MapFrom(s => s.Conference.NameEn))
-            .ForMember(d => d.AuthorCount, opt => opt.MapFrom(s => s.Authors.Count(a => !a.IsDeleted)));
+            .ForMember(d => d.AuthorCount, opt => opt.MapFrom(s => s.Authors.Count(a => !a.IsDeleted)))
+            .ForMember(d => d.AverageScore, opt => opt.MapFrom(s => 
+                s.Reviews.Where(r => r.Status == Domain.Enums.ReviewStatus.Completed && r.OverallScore.HasValue)
+                    .Select(r => r.OverallScore!.Value)
+                    .DefaultIfEmpty()
+                    .Average()));
         
         CreateMap<Research, PublicResearchDto>()
             .ForMember(d => d.ConferenceName, opt => opt.MapFrom(s => s.Conference.NameEn))
@@ -68,5 +75,6 @@ public class MappingProfile : Profile
         // File mappings
         CreateMap<ResearchFile, FileUploadResponse>()
             .ForMember(d => d.FileId, opt => opt.MapFrom(s => s.Id));
+        CreateMap<ResearchFile, ResearchFileDto>();
     }
 }

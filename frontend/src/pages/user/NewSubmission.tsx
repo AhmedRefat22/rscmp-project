@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, Trash2, Upload, Send } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Upload, Send, Save } from 'lucide-react';
 import { conferencesApi, researchApi } from '../../api/services';
 import { useAuthStore } from '../../store/authStore';
 import { Conference, ResearchCreateRequest } from '../../types';
 
 export default function NewSubmission() {
+    const { id } = useParams<{ id: string }>(); // Check if we are in edit mode
+    const isEditMode = !!id;
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [conferences, setConferences] = useState<Conference[]>([]);
@@ -17,7 +19,7 @@ export default function NewSubmission() {
     const [file, setFile] = useState<File | null>(null);
 
     const { user } = useAuthStore();
-    const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<ResearchCreateRequest>({
+    const { register, handleSubmit, control, reset, formState: { errors } } = useForm<ResearchCreateRequest>({
         defaultValues: {
             authors: [{
                 fullNameEn: user?.fullNameEn || '',
@@ -30,22 +32,37 @@ export default function NewSubmission() {
 
     const { fields, append, remove } = useFieldArray({ control, name: 'authors' });
 
+    // Fetch research data if in edit mode
     useEffect(() => {
-        if (user && fields.length === 0) {
-            append({
-                fullNameEn: user.fullNameEn,
-                fullNameAr: user.fullNameAr,
-                email: user.email,
-                isCorresponding: true
-            });
-        } else if (user && fields.length > 0 && !fields[0].email) {
-            // Ensure first author is the user if empty
-            setValue('authors.0.fullNameEn', user.fullNameEn);
-            setValue('authors.0.fullNameAr', user.fullNameAr);
-            setValue('authors.0.email', user.email);
-            setValue('authors.0.isCorresponding', true);
-        }
-    }, [user, append, fields.length, setValue]);
+        if (!isEditMode) return;
+
+        const fetchResearch = async () => {
+            try {
+                if (!id) return;
+                const research = await researchApi.getById(id);
+
+                // Map research data to form values
+                reset({
+                    conferenceId: research.conferenceId,
+                    titleEn: research.titleEn,
+                    titleAr: research.titleAr,
+                    abstractEn: research.abstractEn,
+                    abstractAr: research.abstractAr,
+                    topicArea: research.topicArea || '',
+                    authors: research.authors.map(a => ({
+                        fullNameEn: a.fullName, // Adjust as best as we can since DB only sends FullName
+                        fullNameAr: '', // Cannot recover Ar name if not stored separately
+                        email: a.email,
+                        isCorresponding: a.isCorresponding
+                    }))
+                });
+            } catch {
+                toast.error(t('errors.notFound'));
+                navigate('/my-submissions');
+            }
+        };
+        fetchResearch();
+    }, [id, isEditMode, navigate, reset, t]);
 
     useEffect(() => {
         const fetchConferences = async () => {
@@ -61,20 +78,48 @@ export default function NewSubmission() {
         fetchConferences();
     }, [t]);
 
+
+    useEffect(() => {
+        if (!isEditMode && user && fields.length === 0) {
+            append({
+                fullNameEn: user.fullNameEn,
+                fullNameAr: user.fullNameAr,
+                email: user.email,
+                isCorresponding: true
+            });
+        }
+    }, [user, append, fields.length, isEditMode]);
+
     const onSubmit = async (data: ResearchCreateRequest) => {
         setIsSubmitting(true);
         try {
-            // Remove keywords if present in data (though we removed the input)
-            const submissionData = { ...data, keywords: '' };
-            const research = await researchApi.create(submissionData);
+            // Map authors to match backend DTO (frontend has fullNameEn/Ar, backend expects FullName)
+            const submissionData = {
+                ...data,
+                keywords: '',
+                authors: data.authors.map(a => ({
+                    ...a,
+                    fullName: a.fullNameEn || a.fullNameAr // Fallback
+                }))
+            };
 
-            if (file) {
-                await researchApi.uploadFile(research.id, file);
+            let researchId = id;
+            if (isEditMode && id) {
+                await researchApi.update(id, submissionData);
+                toast.success(t('common.success'));
+            } else {
+                const research = await researchApi.create(submissionData);
+                researchId = research.id;
+                toast.success(t('common.success'));
             }
 
-            toast.success(t('common.success'));
-            navigate(`/my-submissions/${research.id}`);
+            if (file && researchId) {
+                await researchApi.uploadFile(researchId, file);
+            }
+
+            navigate('/my-submissions');
         } catch (error: any) {
+            console.error(error);
             toast.error(error.response?.data?.message || t('errors.serverError'));
         } finally {
             setIsSubmitting(false);
@@ -98,7 +143,7 @@ export default function NewSubmission() {
 
             <div className="card">
                 <h1 className="text-2xl font-bold text-secondary-800 dark:text-white mb-6">
-                    {t('research.newSubmission')}
+                    {isEditMode ? (i18n.language === 'ar' ? 'تعديل البحث' : 'Edit Submission') : t('research.newSubmission')}
                 </h1>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -260,8 +305,8 @@ export default function NewSubmission() {
                             {t('common.cancel')}
                         </button>
                         <button type="submit" disabled={isSubmitting} className="btn-primary">
-                            <Send className="w-4 h-4 me-2" />
-                            {isSubmitting ? t('common.loading') : t('research.submitResearch')}
+                            {isEditMode ? <Save className="w-4 h-4 me-2" /> : <Send className="w-4 h-4 me-2" />}
+                            {isSubmitting ? t('common.loading') : (isEditMode ? (i18n.language === 'ar' ? 'حفظ التعديلات' : 'Save Changes') : (i18n.language === 'ar' ? 'حفظ كمسودة' : 'Save Draft'))}
                         </button>
                     </div>
                 </form>

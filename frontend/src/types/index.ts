@@ -78,6 +78,7 @@ export type ResearchStatus =
 export interface Author {
     fullNameEn: string;
     fullNameAr: string;
+    fullName?: string; // From Backend DTO
     email: string;
     institution?: string;
     isCorresponding: boolean;
@@ -105,6 +106,8 @@ export interface Research {
     submittedAt?: string;
     conferenceId: string;
     conferenceName?: string;
+    averageScore?: number; // From Backend DTO
+    reviews?: Review[]; // Added this
     authors: Author[];
     files: ResearchFile[];
     conference?: {
@@ -113,6 +116,8 @@ export interface Research {
         nameAr: string;
         reviewCriteria?: ReviewCriteria[];
     };
+    decision?: Decision;
+    submitterName?: string;
 }
 
 export interface ResearchCreateRequest {
@@ -127,7 +132,7 @@ export interface ResearchCreateRequest {
 }
 
 // Review types
-export type ReviewStatus = 'Pending' | 'InProgress' | 'Completed' | 'Declined';
+export type ReviewStatus = 'Pending' | 'InProgress' | 'Completed' | 'Declined' | 'Returned';
 export type DecisionType = 'Approved' | 'Rejected' | 'RevisionRequired';
 
 export interface ReviewCriteria {
@@ -161,6 +166,8 @@ export interface Review {
     recommendation?: DecisionType;
     commentsToAuthor?: string;
     commentsToChairman?: string;
+    chairmanFeedback?: string;
+    isChairApproved: boolean;
     scores: ReviewScore[];
 }
 

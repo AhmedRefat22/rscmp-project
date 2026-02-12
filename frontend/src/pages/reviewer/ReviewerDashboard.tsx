@@ -1,21 +1,29 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ClipboardList, CheckCircle, Clock, AlertCircle } from 'lucide-react';
-import { dashboardApi } from '../../api/services';
-import { ReviewerDashboard as ReviewerDashboardType } from '../../types';
+import { ClipboardList, CheckCircle, Clock, FileText, ArrowRight } from 'lucide-react';
+import { dashboardApi, reviewsApi } from '../../api/services';
+import { ReviewerDashboard as ReviewerDashboardType, Research } from '../../types';
 import { handleApiError } from '../../utils/errorHandler';
+import toast from 'react-hot-toast';
 
 export default function ReviewerDashboard() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const [dashboard, setDashboard] = useState<ReviewerDashboardType | null>(null);
+    const [availablePapers, setAvailablePapers] = useState<Research[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [assigningId, setAssigningId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await dashboardApi.getReviewer();
-                setDashboard(data);
+                const [dashData, papers] = await Promise.all([
+                    dashboardApi.getReviewer(),
+                    reviewsApi.getAvailable(),
+                ]);
+                setDashboard(dashData);
+                setAvailablePapers(papers);
             } catch (error) {
                 handleApiError(error);
             } finally {
@@ -24,6 +32,20 @@ export default function ReviewerDashboard() {
         };
         fetchData();
     }, [t]);
+
+    const handleSelfAssign = async (researchId: string) => {
+        setAssigningId(researchId);
+        try {
+            const review = await reviewsApi.selfAssign(researchId);
+            toast.success(i18n.language === 'ar' ? 'تم تعيين البحث بنجاح' : 'Research assigned successfully');
+            // Navigate to the review page
+            navigate(`/reviewer/reviews/${review.id}`);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('errors.serverError'));
+        } finally {
+            setAssigningId(null);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -76,6 +98,64 @@ export default function ReviewerDashboard() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Available Papers for Review */}
+            <div className="mb-6">
+                <h2 className="text-xl font-semibold text-secondary-800 dark:text-white mb-4 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary-500" />
+                    {i18n.language === 'ar' ? 'الأبحاث المتاحة للتقييم' : 'Papers Available for Review'}
+                </h2>
+
+                {availablePapers.length > 0 ? (
+                    <div className="grid gap-4">
+                        {availablePapers.map((paper) => (
+                            <div
+                                key={paper.id}
+                                className="card hover:shadow-lg transition-shadow border-s-4 border-primary-500"
+                            >
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-semibold text-secondary-800 dark:text-white mb-1">
+                                            {i18n.language === 'ar' ? paper.titleAr : paper.titleEn}
+                                        </h3>
+                                        <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2 line-clamp-2">
+                                            {i18n.language === 'ar' ? paper.abstractAr : paper.abstractEn}
+                                        </p>
+                                        <div className="flex items-center gap-3 text-xs text-secondary-500">
+                                            <span>{paper.conferenceName}</span>
+                                            {paper.submissionNumber && <span>• {paper.submissionNumber}</span>}
+                                            {paper.submittedAt && (
+                                                <span>• {new Date(paper.submittedAt).toLocaleDateString()}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleSelfAssign(paper.id)}
+                                        disabled={assigningId === paper.id}
+                                        className="btn-primary flex items-center gap-2 whitespace-nowrap"
+                                    >
+                                        {assigningId === paper.id ? (
+                                            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                        ) : (
+                                            <ArrowRight className="w-4 h-4" />
+                                        )}
+                                        {assigningId === paper.id
+                                            ? (i18n.language === 'ar' ? 'جاري...' : 'Assigning...')
+                                            : (i18n.language === 'ar' ? 'ابدأ التقييم' : 'Start Review')}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="card text-center py-12">
+                        <FileText className="w-12 h-12 mx-auto text-secondary-300 dark:text-secondary-600 mb-3" />
+                        <p className="text-secondary-500 dark:text-secondary-400">
+                            {i18n.language === 'ar' ? 'لا توجد أبحاث متاحة للتقييم حالياً' : 'No papers available for review at the moment'}
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );

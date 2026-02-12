@@ -72,13 +72,14 @@ public class AdminController : ControllerBase
             userDtos.Add(userDto);
         }
 
-        return Ok(new PagedResult<UserDto>(
-            userDtos,
-            totalCount,
-            request.PageNumber,
-            request.PageSize,
-            (int)Math.Ceiling(totalCount / (double)request.PageSize)
-        ));
+        return Ok(new PagedResult<UserDto>
+        {
+            Items = userDtos,
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize)
+        });
     }
 
     /// <summary>
@@ -282,13 +283,14 @@ public class AdminController : ControllerBase
             .Take(request.PageSize)
             .ToListAsync();
 
-        return Ok(new PagedResult<AuditLog>(
-            logs,
-            totalCount,
-            request.PageNumber,
-            request.PageSize,
-            (int)Math.Ceiling(totalCount / (double)request.PageSize)
-        ));
+        return Ok(new PagedResult<AuditLog>
+        {
+            Items = logs,
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize)
+        });
     }
 
     /// <summary>
@@ -313,13 +315,14 @@ public class AdminController : ControllerBase
 
         var dtos = _mapper.Map<IEnumerable<ContactMessageDto>>(messages);
 
-        return Ok(new PagedResult<ContactMessageDto>(
-            dtos,
-            totalCount,
-            request.PageNumber,
-            request.PageSize,
-            (int)Math.Ceiling(totalCount / (double)request.PageSize)
-        ));
+        return Ok(new PagedResult<ContactMessageDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize)
+        });
     }
 
     /// <summary>
@@ -360,16 +363,17 @@ public class AdminController : ControllerBase
     {
         var now = DateTime.UtcNow;
 
-        var dashboard = new AdminDashboardDto(
-            TotalConferences: await _context.Conferences.CountAsync(),
-            ActiveConferences: await _context.Conferences.CountAsync(c => c.IsActive && c.EndDate >= now),
-            TotalResearches: await _context.Researches.CountAsync(),
-            PendingResearches: await _context.Researches.CountAsync(r => r.Status == ResearchStatus.Submitted || r.Status == ResearchStatus.UnderReview),
-            TotalUsers: await _context.Users.CountAsync(u => !u.IsDeleted),
-            TotalReviewers: await _context.UserRoles.CountAsync(ur => ur.RoleId == _context.Roles.Where(r => r.Name == "Reviewer").Select(r => r.Id).FirstOrDefault()),
-            UnreadMessages: await _context.ContactMessages.CountAsync(m => m.Status == ContactMessageStatus.New),
-            RecentActivities: await GetRecentActivitiesAsync()
-        );
+        var dashboard = new AdminDashboardDto
+        {
+            TotalConferences = await _context.Conferences.CountAsync(),
+            ActiveConferences = await _context.Conferences.CountAsync(c => c.IsActive && c.EndDate >= now),
+            TotalResearches = await _context.Researches.CountAsync(),
+            PendingResearches = await _context.Researches.CountAsync(r => r.Status == ResearchStatus.Submitted || r.Status == ResearchStatus.UnderReview),
+            TotalUsers = await _context.Users.CountAsync(u => !u.IsDeleted),
+            TotalReviewers = await _context.UserRoles.CountAsync(ur => ur.RoleId == _context.Roles.Where(r => r.Name == "Reviewer").Select(r => r.Id).FirstOrDefault()),
+            UnreadMessages = await _context.ContactMessages.CountAsync(m => m.Status == ContactMessageStatus.New),
+            RecentActivities = await GetRecentActivitiesAsync()
+        };
 
         return Ok(dashboard);
     }
@@ -382,12 +386,13 @@ public class AdminController : ControllerBase
             .Take(10)
             .ToListAsync();
 
-        return logs.Select(l => new RecentActivityDto(
-            l.Action,
-            l.EntityType,
-            l.CreatedAt,
-            l.User?.FullNameEn
-        ));
+        return logs.Select(l => new RecentActivityDto
+        {
+            Action = l.Action,
+            Entity = l.EntityType,
+            Timestamp = l.CreatedAt,
+            Details = l.User?.FullNameEn
+        });
     }
 
     private Guid? GetCurrentUserId()

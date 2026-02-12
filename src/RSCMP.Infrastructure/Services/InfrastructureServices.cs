@@ -107,23 +107,34 @@ public class AuditService : IAuditService
 
     public async Task LogAsync(string action, string entityType, Guid? entityId = null, object? oldValues = null, object? newValues = null, string? additionalInfo = null)
     {
-        var httpContext = _httpContextAccessor.HttpContext;
-        
-        var auditLog = new AuditLog
+        try
         {
-            UserId = _currentUserService.UserId,
-            Action = action,
-            EntityType = entityType,
-            EntityId = entityId,
-            OldValues = oldValues != null ? JsonSerializer.Serialize(oldValues) : null,
-            NewValues = newValues != null ? JsonSerializer.Serialize(newValues) : null,
-            IpAddress = httpContext?.Connection?.RemoteIpAddress?.ToString(),
-            UserAgent = httpContext?.Request?.Headers["User-Agent"].FirstOrDefault(),
-            AdditionalInfo = additionalInfo
-        };
+            var httpContext = _httpContextAccessor.HttpContext;
+            
+            // Only set UserId if the user is actually authenticated
+            Guid? userId = _currentUserService.IsAuthenticated ? _currentUserService.UserId : null;
+            
+            var auditLog = new AuditLog
+            {
+                UserId = userId,
+                Action = action,
+                EntityType = entityType,
+                EntityId = entityId,
+                OldValues = oldValues != null ? JsonSerializer.Serialize(oldValues) : null,
+                NewValues = newValues != null ? JsonSerializer.Serialize(newValues) : null,
+                IpAddress = httpContext?.Connection?.RemoteIpAddress?.ToString(),
+                UserAgent = httpContext?.Request?.Headers["User-Agent"].FirstOrDefault(),
+                AdditionalInfo = additionalInfo
+            };
 
-        _context.AuditLogs.Add(auditLog);
-        await _context.SaveChangesAsync();
+            _context.AuditLogs.Add(auditLog);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            // Audit logging should never crash the application
+            Console.WriteLine($"[AUDIT ERROR] Failed to log '{action}': {ex.Message}");
+        }
     }
 }
 

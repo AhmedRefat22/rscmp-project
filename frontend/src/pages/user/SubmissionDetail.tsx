@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { ArrowLeft, FileText, Download, Upload, Send, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { ArrowLeft, FileText, Download, Upload, Send, CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
 import { researchApi } from '../../api/services';
 import { Research } from '../../types';
 
@@ -15,7 +15,7 @@ export default function SubmissionDetail() {
     const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
-        const fetchResearch = async () => {
+        const fetchData = async () => {
             if (!id) return;
             try {
                 const data = await researchApi.getById(id);
@@ -27,7 +27,7 @@ export default function SubmissionDetail() {
                 setIsLoading(false);
             }
         };
-        fetchResearch();
+        fetchData();
     }, [id, navigate, t]);
 
     const handleSubmit = async () => {
@@ -96,6 +96,11 @@ export default function SubmissionDetail() {
     const config = statusConfig[research.status] || statusConfig.Draft;
     const StatusIcon = config.icon;
 
+    // Check if there are any comments to show
+    const hasReviewerComments = research.reviews && research.reviews.some(r => r.commentsToAuthor);
+    const hasDecisionComments = research.decision && research.decision.commentsToAuthor;
+    const hasAnyComments = hasReviewerComments || hasDecisionComments;
+
     return (
         <div className="animate-fade-in max-w-4xl mx-auto">
             <button onClick={() => navigate('/my-submissions')} className="btn-ghost mb-4">
@@ -155,6 +160,10 @@ export default function SubmissionDetail() {
                             {research.submittedAt ? new Date(research.submittedAt).toLocaleDateString() : 'Not submitted'}
                         </p>
                     </div>
+                    <div>
+                        <p className="text-sm text-secondary-500">{i18n.language === 'ar' ? 'مقدم البحث' : 'Submitted By'}</p>
+                        <p className="font-medium text-secondary-800 dark:text-white">{research.submitterName || 'N/A'}</p>
+                    </div>
                 </div>
             </div>
 
@@ -180,34 +189,80 @@ export default function SubmissionDetail() {
                 </div>
             </div>
 
-            {/* Review Results - Only valid for final statuses */}
-            {(research.status === 'Approved' || research.status === 'Rejected' || research.status === 'RevisionRequired') && (
+            {/* Feedback & Comments Section */}
+            {research.status !== 'Draft' && hasAnyComments && (
                 <div className="card mb-6">
-                    <h2 className="text-lg font-semibold text-secondary-800 dark:text-white mb-4">
+                    <h2 className="text-lg font-semibold text-secondary-800 dark:text-white mb-4 flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-primary-500" />
                         {t('common.results')}
                     </h2>
 
                     {/* Overall Score if available */}
-                    {research.overallScore !== undefined && (
-                        <div className="mb-6 p-4 bg-secondary-50 dark:bg-secondary-700/50 rounded-lg flex items-center justify-between">
-                            <span className="font-medium text-secondary-800 dark:text-white">{t('reviewer.score')}</span>
-                            <span className="text-2xl font-bold text-primary-600">{research.overallScore}</span>
+                    {research.averageScore !== undefined && research.averageScore !== null && (
+                        <div className="mb-6 p-4 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg flex items-center justify-between border border-primary-100 dark:border-primary-800/30">
+                            <span className="font-medium text-secondary-800 dark:text-white">
+                                {i18n.language === 'ar' ? 'الدرجة الإجمالية' : 'Overall Score'}
+                            </span>
+                            <span className="text-2xl font-bold text-primary-600">{research.averageScore.toFixed(1)}</span>
                         </div>
                     )}
 
-                    {/* Comments to Author */}
-                    {research.reviews && research.reviews.length > 0 && (
-                        <div className="space-y-4">
-                            <h3 className="font-medium text-secondary-800 dark:text-white">{t('reviewer.comments')}</h3>
-                            {research.reviews.map((review, idx) => (
-                                review.commentsToAuthor && (
-                                    <div key={idx} className="p-4 bg-secondary-50 dark:bg-secondary-700/50 rounded-lg">
-                                        <p className="text-sm text-secondary-600 dark:text-secondary-400 whitespace-pre-wrap">
-                                            {review.commentsToAuthor}
-                                        </p>
-                                    </div>
-                                )
-                            ))}
+                    {/* Reviewer Comments */}
+                    {hasReviewerComments && (
+                        <div className="mb-6">
+                            <h3 className="font-medium text-secondary-800 dark:text-white flex items-center gap-2 mb-3">
+                                <FileText className="w-4 h-4 text-blue-500" />
+                                {i18n.language === 'ar' ? 'تعليقات المراجعين' : 'Reviewer Comments'}
+                            </h3>
+                            <div className="space-y-3">
+                                {research.reviews!.map((review, idx) => (
+                                    review.commentsToAuthor && (
+                                        <div key={idx} className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded-full">
+                                                    {i18n.language === 'ar' ? `مراجع ${idx + 1}` : `Reviewer ${idx + 1}`}
+                                                </span>
+                                                {review.overallScore !== undefined && review.overallScore !== null && (
+                                                    <span className="text-xs text-secondary-500">
+                                                        {i18n.language === 'ar' ? `الدرجة: ${review.overallScore}` : `Score: ${review.overallScore}`}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-sm text-secondary-700 dark:text-secondary-300 whitespace-pre-wrap">
+                                                {review.commentsToAuthor}
+                                            </p>
+                                        </div>
+                                    )
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Chairman Decision Comments */}
+                    {hasDecisionComments && (
+                        <div>
+                            <h3 className="font-medium text-secondary-800 dark:text-white flex items-center gap-2 mb-3">
+                                <CheckCircle className="w-4 h-4 text-purple-500" />
+                                {i18n.language === 'ar' ? 'تعليقات رئيس اللجنة' : 'Chairman Comments'}
+                            </h3>
+                            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-900/30">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/40 px-2 py-0.5 rounded-full">
+                                        {i18n.language === 'ar' ? 'قرار رئيس اللجنة' : 'Chairman Decision'}
+                                    </span>
+                                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${research.decision!.decision === 'Approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' :
+                                        research.decision!.decision === 'Rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400' :
+                                            'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400'
+                                        }`}>
+                                        {research.decision!.decision === 'Approved' ? (i18n.language === 'ar' ? 'مقبول' : 'Approved') :
+                                            research.decision!.decision === 'Rejected' ? (i18n.language === 'ar' ? 'مرفوض' : 'Rejected') :
+                                                (i18n.language === 'ar' ? 'يحتاج تعديل' : 'Revision Required')}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-secondary-700 dark:text-secondary-300 whitespace-pre-wrap">
+                                    {research.decision!.commentsToAuthor}
+                                </p>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -257,10 +312,15 @@ export default function SubmissionDetail() {
                             ? 'بمجرد تقديم البحث، لن تتمكن من تعديله.'
                             : 'Once submitted, you will not be able to edit your research.'}
                     </p>
-                    <button onClick={handleSubmit} className="btn-primary">
-                        <Send className="w-4 h-4 me-2" />
-                        {t('research.submitResearch')}
-                    </button>
+                    <div className="flex gap-4">
+                        <button onClick={() => navigate(`/my-submissions/edit/${research.id}`)} className="btn-secondary">
+                            {i18n.language === 'ar' ? 'تعديل البيانات' : 'Edit Details'}
+                        </button>
+                        <button onClick={handleSubmit} className="btn-primary">
+                            <Send className="w-4 h-4 me-2" />
+                            {t('research.submitResearch')}
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
