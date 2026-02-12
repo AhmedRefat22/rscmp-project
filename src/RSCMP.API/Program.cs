@@ -53,8 +53,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
                     Host = uri.Host,
                     Port = uri.Port > 0 ? uri.Port : 5432,
                     Database = uri.AbsolutePath.Trim('/'),
-                    Username = userInfo.Length > 0 ? userInfo[0] : null,
-                    Password = userInfo.Length > 1 ? userInfo[1] : null,
+                    Username = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : null,
+                    Password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : null,
                     Pooling = true
                 };
                 connectionString = builder.ToString();
